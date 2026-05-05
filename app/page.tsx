@@ -10,6 +10,13 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [año, setAño] = useState(obtenerAñoActual());
 
+  const formatTooltip = (value: any) => {
+    if (typeof value === 'number') {
+      return formatearMoneda(value);
+    }
+    return value;
+  };
+
   useEffect(() => {
     async function cargarDatos() {
       try {
@@ -91,7 +98,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="mes" />
                   <YAxis />
-                  <Tooltip formatter={(value) => formatearMoneda(value)} />
+                  <Tooltip formatter={formatTooltip} />
                   <Legend />
                   <Bar dataKey="totalIngresos" fill="#10b981" name="Ingresos" />
                   <Bar dataKey="totalEgresos" fill="#ef4444" name="Egresos" />
@@ -107,7 +114,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="mes" />
                   <YAxis />
-                  <Tooltip formatter={(value) => formatearMoneda(value)} />
+                  <Tooltip formatter={formatTooltip} />
                   <Legend />
                   <Line
                     type="monotone"
