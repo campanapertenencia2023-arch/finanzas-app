@@ -220,7 +220,7 @@ export async function getResumenPorConcepto(userId: number, año?: number) {
   // Ingresos por concepto
   let queryIngresos = supabase
     .from('ingresos')
-    .select('monto, conceptos_ingresos(nombre)')
+    .select('monto, concepto_id, conceptos_ingresos!inner(nombre)')
     .eq('user_id', userId);
 
   if (año) queryIngresos = queryIngresos.eq('año', año);
@@ -230,7 +230,7 @@ export async function getResumenPorConcepto(userId: number, año?: number) {
   // Egresos por concepto
   let queryEgresos = supabase
     .from('egresos')
-    .select('monto, conceptos_egresos(nombre)')
+    .select('monto, concepto_id, conceptos_egresos!inner(nombre)')
     .eq('user_id', userId);
 
   if (año) queryEgresos = queryEgresos.eq('año', año);
@@ -241,7 +241,7 @@ export async function getResumenPorConcepto(userId: number, año?: number) {
 
   // Agrupar ingresos por concepto
   const ingresosMap = new Map<string, number>();
-  (ingresosData || []).forEach(item => {
+  (ingresosData || []).forEach((item: any) => {
     const nombre = item.conceptos_ingresos?.nombre || 'Sin concepto';
     const monto = parseFloat(item.monto);
     ingresosMap.set(nombre, (ingresosMap.get(nombre) || 0) + monto);
@@ -249,7 +249,7 @@ export async function getResumenPorConcepto(userId: number, año?: number) {
 
   // Agrupar egresos por concepto
   const egresosMap = new Map<string, number>();
-  (egresosData || []).forEach(item => {
+  (egresosData || []).forEach((item: any) => {
     const nombre = item.conceptos_egresos?.nombre || 'Sin concepto';
     const monto = parseFloat(item.monto);
     egresosMap.set(nombre, (egresosMap.get(nombre) || 0) + monto);
