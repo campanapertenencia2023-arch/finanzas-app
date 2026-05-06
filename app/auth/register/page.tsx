@@ -1,144 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signUp } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-
-  async function handleRegister(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      await signUp(email, password, fullName);
-      setSuccess(true);
-      setTimeout(() => {
-        router.push('/auth/login');
-      }, 2000);
-    } catch (err: any) {
-      setError(err.message || 'Error al registrarse');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  if (success) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#d4e4f7] to-[#fafafa] flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <h2 className="text-2xl font-bold text-green-600 mb-4">¡Registro exitoso!</h2>
-            <p className="text-gray-600 mb-4">
-              Tu cuenta ha sido creada. Redirigiendo a inicio de sesión...
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#d4e4f7] to-[#fafafa] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Crear cuenta</h1>
-          <p className="text-gray-600 mb-6">Regístrate para gestionar tus finanzas</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Finanzas</h1>
+          <p className="text-gray-600 mb-6">Solo hay acceso para usuarios preestablecidos</p>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-              {error}
-            </div>
-          )}
+          <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-8">
+            <p className="font-semibold mb-3">Usuarios disponibles:</p>
+            <p className="mb-2">👤 Usuario: <strong>julian</strong></p>
+            <p className="mb-2">🔑 Contraseña: <strong>julian123</strong></p>
+            <hr className="my-3" />
+            <p className="mb-2">👤 Usuario: <strong>paola</strong></p>
+            <p>🔑 Contraseña: <strong>paola123</strong></p>
+          </div>
 
-          <form onSubmit={handleRegister} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre completo
-              </label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a6fa5] focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a6fa5] focus:border-transparent"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contraseña
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a6fa5] focus:border-transparent"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Confirmar contraseña
-              </label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a6fa5] focus:border-transparent"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-4 py-2 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f] disabled:bg-gray-400 font-semibold"
-            >
-              {loading ? 'Registrando...' : 'Registrarse'}
-            </button>
-          </form>
-
-          <p className="text-center text-gray-600 mt-6">
-            ¿Ya tienes cuenta?{' '}
-            <Link href="/auth/login" className="text-[#4a6fa5] hover:underline font-semibold">
-              Inicia sesión
-            </Link>
-          </p>
+          <Link
+            href="/auth/login"
+            className="w-full block text-center px-6 py-3 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f] font-semibold"
+          >
+            Ir a iniciar sesión
+          </Link>
         </div>
       </div>
     </div>

@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/auth-context';
 import { getResumenMensual } from '@/lib/supabase';
 import { getNombreMes, formatearMoneda, obtenerAñoActual } from '@/lib/utils';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function Dashboard() {
+  const { usuario, loading: authLoading } = useAuth();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [año, setAño] = useState(obtenerAñoActual());
@@ -19,8 +21,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function cargarDatos() {
+      if (!usuario) return;
       try {
-        const resumen = await getResumenMensual(año);
+        const resumen = await getResumenMensual(usuario.id, año);
         setData(resumen);
       } catch (error) {
         console.error('Error al cargar datos:', error);
@@ -29,8 +32,12 @@ export default function Dashboard() {
       }
     }
 
-    cargarDatos();
-  }, [año]);
+    if (!authLoading && usuario) {
+      cargarDatos();
+    } else if (!authLoading && !usuario) {
+      setLoading(false);
+    }
+  }, [año, usuario, authLoading]);
 
   const totalIngresos = data.reduce((sum, d) => sum + d.totalIngresos, 0);
   const totalEgresos = data.reduce((sum, d) => sum + d.totalEgresos, 0);

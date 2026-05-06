@@ -1,76 +1,57 @@
 import { supabase } from './supabase';
+import type { UsuarioLogueado } from './types';
 
-export type User = {
-  id: string;
-  email: string;
-  user_metadata?: {
-    name?: string;
-  };
-};
+const STORAGE_KEY = 'usuario_actual';
 
-export async function signUp(email: string, password: string, fullName?: string) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        name: fullName,
-      },
-    },
-  });
+export async function login(nombre: string, password: string): Promise<UsuarioLogueado> {
+  const { data, error } = await supabase
+    .from('usuarios')
+    .select('id, nombre, password')
+    .eq('nombre', nombre)
+    .single();
 
-  if (error) throw error;
-  return data;
+  if (error || !data) {
+    throw new Error('Usuario o contraseña incorrectos');
+  }
+
+  // Verificar contraseña (en un app real, usar bcrypt)
+  if (data.password !== password) {
+    throw new Error('Usuario o contraseña incorrectos');
+  }
+
+  // Guardar en localStorage
+  const usuario: UsuarioLogueado = { id: data.id, nombre: data.nombre };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(usuario));
+
+  return usuario;
 }
 
-export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) throw error;
-  return data;
+export function logout(): void {
+  localStorage.removeItem(STORAGE_KEY);
 }
 
-export async function signOut() {
-  const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+export function getUsuarioActual(): UsuarioLogueado | null {
+  if (typeof window === 'undefined') return null;
+
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored ? JSON.parse(stored) : null;
 }
 
-export async function getCurrentUser(): Promise<User | null> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export function onUsuarioChange(callback: (usuario: UsuarioLogueado | null) => void): () => void {
+  // Ejecutar inmediatamente
+  callback(getUsuarioActual());
 
-  if (!user) return null;
-
-  return {
-    id: user.id,
-    email: user.email || '',
-    user_metadata: user.user_metadata,
-  };
-}
-
-export async function resetPassword(email: string) {
-  const { error } = await supabase.auth.resetPasswordForEmail(email);
-  if (error) throw error;
-}
-
-export async function onAuthStateChange(callback: (user: User | null) => void) {
-  const {
-    data: { subscription },
-  } = supabase.auth.onAuthStateChange(async (event, session) => {
-    if (session?.user) {
-      callback({
-        id: session.user.id,
-        email: session.user.email || '',
-        user_metadata: session.user.user_metadata,
-      });
-    } else {
-      callback(null);
+  // Escuchar cambios en localStorage
+  const handleStorageChange = (e: StorageEvent) => {
+    if (e.key === STORAGE_KEY) {
+      callback(e.newValue ? JSON.parse(e.newValue) : null);
     }
-  });
+  };
 
-  return subscription;
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }
+
+  return () => {};
 }

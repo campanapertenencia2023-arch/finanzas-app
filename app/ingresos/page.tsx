@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/auth-context';
 import { getIngresos, getConceptosIngresos, crearIngreso, eliminarIngreso } from '@/lib/supabase';
 import { formatearMoneda, getNombreMes, obtenerAñoActual, obtenerMesActual } from '@/lib/utils';
 import type { ConceptoIngreso } from '@/lib/types';
 
 export default function IngressosPage() {
+  const { usuario, loading: authLoading } = useAuth();
   const [ingresos, setIngresos] = useState<any[]>([]);
   const [conceptos, setConceptos] = useState<ConceptoIngreso[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,14 +21,19 @@ export default function IngressosPage() {
   });
 
   useEffect(() => {
-    cargarDatos();
-  }, [mes, año]);
+    if (!authLoading && usuario) {
+      cargarDatos();
+    } else if (!authLoading && !usuario) {
+      setLoading(false);
+    }
+  }, [mes, año, usuario, authLoading]);
 
   async function cargarDatos() {
+    if (!usuario) return;
     try {
       const [ing, conc] = await Promise.all([
-        getIngresos(mes, año),
-        getConceptosIngresos(),
+        getIngresos(usuario.id, mes, año),
+        getConceptosIngresos(usuario.id),
       ]);
       setIngresos(ing);
       setConceptos(conc);
@@ -39,10 +46,11 @@ export default function IngressosPage() {
 
   async function handleCrearIngreso(e: React.FormEvent) {
     e.preventDefault();
-    if (!formData.concepto_id || !formData.monto) return;
+    if (!formData.concepto_id || !formData.monto || !usuario) return;
 
     try {
       await crearIngreso(
+        usuario.id,
         mes,
         año,
         parseInt(formData.concepto_id),

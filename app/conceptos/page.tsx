@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/auth-context';
 import {
   getConceptosIngresos,
   getConceptosEgresos,
@@ -12,6 +13,7 @@ import {
 import type { ConceptoIngreso, ConceptoEgreso } from '@/lib/types';
 
 export default function ConceptosPage() {
+  const { usuario, loading: authLoading } = useAuth();
   const [conceptosIngresos, setConceptosIngresos] = useState<ConceptoIngreso[]>([]);
   const [conceptosEgresos, setConceptosEgresos] = useState<ConceptoEgreso[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,14 +29,19 @@ export default function ConceptosPage() {
   });
 
   useEffect(() => {
-    cargarDatos();
-  }, []);
+    if (!authLoading && usuario) {
+      cargarDatos();
+    } else if (!authLoading && !usuario) {
+      setLoading(false);
+    }
+  }, [usuario, authLoading]);
 
   async function cargarDatos() {
+    if (!usuario) return;
     try {
       const [ci, ce] = await Promise.all([
-        getConceptosIngresos(),
-        getConceptosEgresos(),
+        getConceptosIngresos(usuario.id),
+        getConceptosEgresos(usuario.id),
       ]);
       setConceptosIngresos(ci);
       setConceptosEgresos(ce);
@@ -47,10 +54,10 @@ export default function ConceptosPage() {
 
   async function handleCrearConceptoIngreso(e: React.FormEvent) {
     e.preventDefault();
-    if (!formIngreso.nombre) return;
+    if (!formIngreso.nombre || !usuario) return;
 
     try {
-      await crearConceptoIngreso(formIngreso.nombre, formIngreso.descripcion);
+      await crearConceptoIngreso(usuario.id, formIngreso.nombre, formIngreso.descripcion);
       setFormIngreso({ nombre: '', descripcion: '' });
       cargarDatos();
     } catch (error) {
@@ -60,10 +67,10 @@ export default function ConceptosPage() {
 
   async function handleCrearConceptoEgreso(e: React.FormEvent) {
     e.preventDefault();
-    if (!formEgreso.nombre) return;
+    if (!formEgreso.nombre || !usuario) return;
 
     try {
-      await crearConceptoEgreso(formEgreso.nombre, formEgreso.descripcion);
+      await crearConceptoEgreso(usuario.id, formEgreso.nombre, formEgreso.descripcion);
       setFormEgreso({ nombre: '', descripcion: '' });
       cargarDatos();
     } catch (error) {

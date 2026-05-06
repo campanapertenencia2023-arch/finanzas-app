@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/auth-context';
 import { getIngresos, getEgresos } from '@/lib/supabase';
 import { formatearMoneda, getNombreMes, obtenerAñoActual } from '@/lib/utils';
 import jsPDF from 'jspdf';
@@ -8,17 +9,19 @@ import { writeFile } from 'xlsx';
 import * as XLSX from 'xlsx';
 
 export default function ReportesPage() {
+  const { usuario, loading: authLoading } = useAuth();
   const [año, setAño] = useState(obtenerAñoActual());
   const [ingresos, setIngresos] = useState<any[]>([]);
   const [egresos, setEgresos] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   async function cargarDatos() {
+    if (!usuario) return;
     setLoading(true);
     try {
       const [ing, egr] = await Promise.all([
-        getIngresos(undefined, año),
-        getEgresos(undefined, año),
+        getIngresos(usuario.id, undefined, año),
+        getEgresos(usuario.id, undefined, año),
       ]);
       setIngresos(ing);
       setEgresos(egr);
@@ -30,8 +33,10 @@ export default function ReportesPage() {
   }
 
   useEffect(() => {
-    cargarDatos();
-  }, [año]);
+    if (!authLoading && usuario) {
+      cargarDatos();
+    }
+  }, [año, usuario, authLoading]);
 
   const totalIngresos = ingresos.reduce((sum, i) => sum + parseFloat(i.monto), 0);
   const totalEgresos = egresos.reduce((sum, e) => sum + parseFloat(e.monto), 0);

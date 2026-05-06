@@ -52,3 +52,14 @@ export type ResumenPorConcepto = {
   concepto: string;
   monto: number;
 };
+
+export type Usuario = {
+  id: number;
+  nombre: string;
+  password: string;
+};
+
+export type UsuarioLogueado = {
+  id: number;
+  nombre: string;
+};

@@ -3,23 +3,19 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { signOut } from '@/lib/auth';
+import { logout } from '@/lib/auth';
 
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { usuario, loading } = useAuth();
 
-  async function handleLogout() {
-    try {
-      await signOut();
-      router.push('/auth/login');
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
+  function handleLogout() {
+    logout();
+    router.push('/auth/login');
   }
 
-  const links = user ? [
+  const links = usuario ? [
     { href: '/', label: 'Dashboard' },
     { href: '/ingresos', label: 'Ingresos' },
     { href: '/egresos', label: 'Egresos' },
@@ -48,9 +44,9 @@ export function Navigation() {
                 {link.label}
               </Link>
             ))}
-            {user && (
+            {usuario && (
               <div className="flex items-center space-x-3 border-l border-[#d4e4f7] pl-4">
-                <span className="text-sm text-[#d4e4f7]">{user.email}</span>
+                <span className="text-sm text-[#d4e4f7]">{usuario.nombre}</span>
                 <button
                   onClick={handleLogout}
                   className="px-3 py-2 text-sm font-medium text-[#d4e4f7] hover:bg-[#3d5a7f] rounded-md transition"
@@ -59,7 +55,7 @@ export function Navigation() {
                 </button>
               </div>
             )}
-            {!user && !loading && (
+            {!usuario && !loading && (
               <Link
                 href="/auth/login"
                 className="px-4 py-2 bg-white text-[#4a6fa5] rounded-lg hover:bg-gray-100 text-sm font-semibold"

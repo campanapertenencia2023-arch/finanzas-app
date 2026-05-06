@@ -7,7 +7,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Conceptos de Ingresos
-export async function getConceptosIngresos(userId: string) {
+export async function getConceptosIngresos(userId: number) {
   const { data, error } = await supabase
     .from('conceptos_ingresos')
     .select('*')
@@ -18,7 +18,7 @@ export async function getConceptosIngresos(userId: string) {
   return data as ConceptoIngreso[];
 }
 
-export async function crearConceptoIngreso(userId: string, nombre: string, descripcion?: string) {
+export async function crearConceptoIngreso(userId: number, nombre: string, descripcion?: string) {
   const { data, error } = await supabase
     .from('conceptos_ingresos')
     .insert([{ user_id: userId, nombre, descripcion }])
@@ -38,7 +38,7 @@ export async function eliminarConceptoIngreso(id: number) {
 }
 
 // Conceptos de Egresos
-export async function getConceptosEgresos(userId: string) {
+export async function getConceptosEgresos(userId: number) {
   const { data, error } = await supabase
     .from('conceptos_egresos')
     .select('*')
@@ -49,7 +49,7 @@ export async function getConceptosEgresos(userId: string) {
   return data as ConceptoEgreso[];
 }
 
-export async function crearConceptoEgreso(userId: string, nombre: string, descripcion?: string) {
+export async function crearConceptoEgreso(userId: number, nombre: string, descripcion?: string) {
   const { data, error } = await supabase
     .from('conceptos_egresos')
     .insert([{ user_id: userId, nombre, descripcion }])
@@ -69,7 +69,7 @@ export async function eliminarConceptoEgreso(id: number) {
 }
 
 // Ingresos
-export async function getIngresos(userId: string, mes?: number, año?: number) {
+export async function getIngresos(userId: number, mes?: number, año?: number) {
   let query = supabase
     .from('ingresos')
     .select('*, conceptos_ingresos(*)')
@@ -85,7 +85,7 @@ export async function getIngresos(userId: string, mes?: number, año?: number) {
 }
 
 export async function crearIngreso(
-  userId: string,
+  userId: number,
   mes: number,
   año: number,
   concepto_id: number,
@@ -125,7 +125,7 @@ export async function eliminarIngreso(id: number) {
 }
 
 // Egresos
-export async function getEgresos(userId: string, mes?: number, año?: number) {
+export async function getEgresos(userId: number, mes?: number, año?: number) {
   let query = supabase
     .from('egresos')
     .select('*, conceptos_egresos(*)')
@@ -141,7 +141,7 @@ export async function getEgresos(userId: string, mes?: number, año?: number) {
 }
 
 export async function crearEgreso(
-  userId: string,
+  userId: number,
   mes: number,
   año: number,
   concepto_id: number,
@@ -181,7 +181,7 @@ export async function eliminarEgreso(id: number) {
 }
 
 // Queries analíticas
-export async function getResumenMensual(userId: string, año: number) {
+export async function getResumenMensual(userId: number, año: number) {
   const { data: ingresos, error: ingresoError } = await supabase
     .from('ingresos')
     .select('mes, monto')

@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/auth-context';
 import { getEgresos, getConceptosEgresos, crearEgreso, eliminarEgreso } from '@/lib/supabase';
 import { formatearMoneda, getNombreMes, obtenerAñoActual, obtenerMesActual } from '@/lib/utils';
 import type { ConceptoEgreso } from '@/lib/types';
 
 export default function EgresosPage() {
+  const { usuario, loading: authLoading } = useAuth();
   const [egresos, setEgresos] = useState<any[]>([]);
   const [conceptos, setConceptos] = useState<ConceptoEgreso[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,14 +21,19 @@ export default function EgresosPage() {
   });
 
   useEffect(() => {
-    cargarDatos();
-  }, [mes, año]);
+    if (!authLoading && usuario) {
+      cargarDatos();
+    } else if (!authLoading && !usuario) {
+      setLoading(false);
+    }
+  }, [mes, año, usuario, authLoading]);
 
   async function cargarDatos() {
+    if (!usuario) return;
     try {
       const [egr, conc] = await Promise.all([
-        getEgresos(mes, año),
-        getConceptosEgresos(),
+        getEgresos(usuario.id, mes, año),
+        getConceptosEgresos(usuario.id),
       ]);
       setEgresos(egr);
       setConceptos(conc);
@@ -39,10 +46,11 @@ export default function EgresosPage() {
 
   async function handleCrearEgreso(e: React.FormEvent) {
     e.preventDefault();
-    if (!formData.concepto_id || !formData.monto) return;
+    if (!formData.concepto_id || !formData.monto || !usuario) return;
 
     try {
       await crearEgreso(
+        usuario.id,
         mes,
         año,
         parseInt(formData.concepto_id),
