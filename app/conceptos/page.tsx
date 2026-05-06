@@ -121,7 +121,7 @@ export default function ConceptosPage() {
                 />
                 <button
                   type="submit"
-                  className="w-full px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  className="w-full px-6 py-2 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f]"
                 >
                   Crear Concepto
                 </button>
@@ -186,7 +186,7 @@ export default function ConceptosPage() {
                 />
                 <button
                   type="submit"
-                  className="w-full px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="w-full px-6 py-2 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f]"
                 >
                   Crear Concepto
                 </button>

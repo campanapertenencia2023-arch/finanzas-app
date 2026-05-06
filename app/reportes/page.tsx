@@ -227,14 +227,14 @@ export default function ReportesPage() {
             <button
               onClick={exportarPDF}
               disabled={loading}
-              className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400"
+              className="px-6 py-3 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f] disabled:bg-gray-400"
             >
               📄 Descargar PDF
             </button>
             <button
               onClick={exportarExcel}
               disabled={loading}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400"
+              className="px-6 py-3 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f] disabled:bg-gray-400"
             >
               📊 Descargar Excel
             </button>

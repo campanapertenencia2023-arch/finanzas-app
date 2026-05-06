@@ -42,7 +42,7 @@ export default function Dashboard() {
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#d4e4f7] to-[#fafafa] p-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-gray-800 mb-8">Dashboard Financiero</h1>
 
@@ -50,7 +50,7 @@ export default function Dashboard() {
         <div className="mb-8 flex gap-4">
           <button
             onClick={() => setAño(año - 1)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f]"
           >
             ← Año anterior
           </button>
@@ -59,7 +59,7 @@ export default function Dashboard() {
           </span>
           <button
             onClick={() => setAño(año + 1)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f]"
           >
             Año siguiente →
           </button>

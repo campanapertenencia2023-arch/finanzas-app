@@ -129,7 +129,7 @@ export default function EgresosPage() {
             />
             <button
               type="submit"
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              className="px-6 py-2 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f]"
             >
               Registrar
             </button>
