@@ -13,6 +13,8 @@ export default function EgresosPage() {
   const [loading, setLoading] = useState(true);
   const [mes, setMes] = useState(obtenerMesActual());
   const [año, setAño] = useState(obtenerAñoActual());
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const [formData, setFormData] = useState({
     concepto_id: '',
@@ -46,8 +48,22 @@ export default function EgresosPage() {
 
   async function handleCrearEgreso(e: React.FormEvent) {
     e.preventDefault();
-    if (!formData.concepto_id || !formData.monto || !usuario) return;
+    setFormError('');
 
+    if (!formData.concepto_id) {
+      setFormError('Selecciona un concepto');
+      return;
+    }
+    if (!formData.monto) {
+      setFormError('Ingresa un monto');
+      return;
+    }
+    if (!usuario) {
+      setFormError('Usuario no autenticado');
+      return;
+    }
+
+    setFormLoading(true);
     try {
       await crearEgreso(
         usuario.id,
@@ -58,9 +74,14 @@ export default function EgresosPage() {
         formData.descripcion
       );
       setFormData({ concepto_id: '', monto: '', descripcion: '' });
-      cargarDatos();
-    } catch (error) {
+      setFormError('');
+      await cargarDatos();
+    } catch (error: any) {
+      const errorMsg = error?.message || 'Error al crear egreso';
+      setFormError(errorMsg);
       console.error('Error al crear egreso:', error);
+    } finally {
+      setFormLoading(false);
     }
   }
 
@@ -107,12 +128,17 @@ export default function EgresosPage() {
         {/* Formulario */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Registrar Egreso</h2>
+          {formError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+              {formError}
+            </div>
+          )}
           <form onSubmit={handleCrearEgreso} className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <select
               value={formData.concepto_id}
               onChange={(e) => setFormData({ ...formData, concepto_id: e.target.value })}
               className="px-4 py-2 border rounded-lg"
-              required
+              disabled={formLoading}
             >
               <option value="">Selecciona concepto</option>
               {conceptos.map(c => (
@@ -126,7 +152,7 @@ export default function EgresosPage() {
               onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
               className="px-4 py-2 border rounded-lg"
               step="0.01"
-              required
+              disabled={formLoading}
             />
             <input
               type="text"
@@ -134,12 +160,14 @@ export default function EgresosPage() {
               value={formData.descripcion}
               onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
               className="px-4 py-2 border rounded-lg"
+              disabled={formLoading}
             />
             <button
               type="submit"
-              className="px-6 py-2 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f]"
+              disabled={formLoading}
+              className="px-6 py-2 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f] disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              Registrar
+              {formLoading ? 'Registrando...' : 'Registrar'}
             </button>
           </form>
         </div>
