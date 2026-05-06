@@ -7,20 +7,21 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Conceptos de Ingresos
-export async function getConceptosIngresos() {
+export async function getConceptosIngresos(userId: string) {
   const { data, error } = await supabase
     .from('conceptos_ingresos')
     .select('*')
+    .eq('user_id', userId)
     .order('nombre');
 
   if (error) throw error;
   return data as ConceptoIngreso[];
 }
 
-export async function crearConceptoIngreso(nombre: string, descripcion?: string) {
+export async function crearConceptoIngreso(userId: string, nombre: string, descripcion?: string) {
   const { data, error } = await supabase
     .from('conceptos_ingresos')
-    .insert([{ nombre, descripcion }])
+    .insert([{ user_id: userId, nombre, descripcion }])
     .select();
 
   if (error) throw error;
@@ -37,20 +38,21 @@ export async function eliminarConceptoIngreso(id: number) {
 }
 
 // Conceptos de Egresos
-export async function getConceptosEgresos() {
+export async function getConceptosEgresos(userId: string) {
   const { data, error } = await supabase
     .from('conceptos_egresos')
     .select('*')
+    .eq('user_id', userId)
     .order('nombre');
 
   if (error) throw error;
   return data as ConceptoEgreso[];
 }
 
-export async function crearConceptoEgreso(nombre: string, descripcion?: string) {
+export async function crearConceptoEgreso(userId: string, nombre: string, descripcion?: string) {
   const { data, error } = await supabase
     .from('conceptos_egresos')
-    .insert([{ nombre, descripcion }])
+    .insert([{ user_id: userId, nombre, descripcion }])
     .select();
 
   if (error) throw error;
@@ -67,10 +69,11 @@ export async function eliminarConceptoEgreso(id: number) {
 }
 
 // Ingresos
-export async function getIngresos(mes?: number, año?: number) {
+export async function getIngresos(userId: string, mes?: number, año?: number) {
   let query = supabase
     .from('ingresos')
-    .select('*, conceptos_ingresos(*)');
+    .select('*, conceptos_ingresos(*)')
+    .eq('user_id', userId);
 
   if (mes) query = query.eq('mes', mes);
   if (año) query = query.eq('año', año);
@@ -82,6 +85,7 @@ export async function getIngresos(mes?: number, año?: number) {
 }
 
 export async function crearIngreso(
+  userId: string,
   mes: number,
   año: number,
   concepto_id: number,
@@ -90,7 +94,7 @@ export async function crearIngreso(
 ) {
   const { data, error } = await supabase
     .from('ingresos')
-    .insert([{ mes, año, concepto_id, monto, descripcion }])
+    .insert([{ user_id: userId, mes, año, concepto_id, monto, descripcion }])
     .select('*, conceptos_ingresos(*)');
 
   if (error) throw error;
@@ -121,10 +125,11 @@ export async function eliminarIngreso(id: number) {
 }
 
 // Egresos
-export async function getEgresos(mes?: number, año?: number) {
+export async function getEgresos(userId: string, mes?: number, año?: number) {
   let query = supabase
     .from('egresos')
-    .select('*, conceptos_egresos(*)');
+    .select('*, conceptos_egresos(*)')
+    .eq('user_id', userId);
 
   if (mes) query = query.eq('mes', mes);
   if (año) query = query.eq('año', año);
@@ -136,6 +141,7 @@ export async function getEgresos(mes?: number, año?: number) {
 }
 
 export async function crearEgreso(
+  userId: string,
   mes: number,
   año: number,
   concepto_id: number,
@@ -144,7 +150,7 @@ export async function crearEgreso(
 ) {
   const { data, error } = await supabase
     .from('egresos')
-    .insert([{ mes, año, concepto_id, monto, descripcion }])
+    .insert([{ user_id: userId, mes, año, concepto_id, monto, descripcion }])
     .select('*, conceptos_egresos(*)');
 
   if (error) throw error;
@@ -175,15 +181,17 @@ export async function eliminarEgreso(id: number) {
 }
 
 // Queries analíticas
-export async function getResumenMensual(año: number) {
+export async function getResumenMensual(userId: string, año: number) {
   const { data: ingresos, error: ingresoError } = await supabase
     .from('ingresos')
     .select('mes, monto')
+    .eq('user_id', userId)
     .eq('año', año);
 
   const { data: egresos, error: egresoError } = await supabase
     .from('egresos')
     .select('mes, monto')
+    .eq('user_id', userId)
     .eq('año', año);
 
   if (ingresoError || egresoError) throw new Error('Error fetching data');
