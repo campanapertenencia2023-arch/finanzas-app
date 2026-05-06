@@ -215,3 +215,53 @@ export async function getResumenMensual(userId: number, año: number) {
     };
   });
 }
+
+export async function getResumenPorConcepto(userId: number, año?: number) {
+  // Ingresos por concepto
+  let queryIngresos = supabase
+    .from('ingresos')
+    .select('monto, conceptos_ingresos(nombre)')
+    .eq('user_id', userId);
+
+  if (año) queryIngresos = queryIngresos.eq('año', año);
+
+  const { data: ingresosData, error: ingresoError } = await queryIngresos;
+
+  // Egresos por concepto
+  let queryEgresos = supabase
+    .from('egresos')
+    .select('monto, conceptos_egresos(nombre)')
+    .eq('user_id', userId);
+
+  if (año) queryEgresos = queryEgresos.eq('año', año);
+
+  const { data: egresosData, error: egresoError } = await queryEgresos;
+
+  if (ingresoError || egresoError) throw new Error('Error fetching data');
+
+  // Agrupar ingresos por concepto
+  const ingresosMap = new Map<string, number>();
+  (ingresosData || []).forEach(item => {
+    const nombre = item.conceptos_ingresos?.nombre || 'Sin concepto';
+    const monto = parseFloat(item.monto);
+    ingresosMap.set(nombre, (ingresosMap.get(nombre) || 0) + monto);
+  });
+
+  // Agrupar egresos por concepto
+  const egresosMap = new Map<string, number>();
+  (egresosData || []).forEach(item => {
+    const nombre = item.conceptos_egresos?.nombre || 'Sin concepto';
+    const monto = parseFloat(item.monto);
+    egresosMap.set(nombre, (egresosMap.get(nombre) || 0) + monto);
+  });
+
+  // Combinar en un resumen
+  const conceptos = new Set([...ingresosMap.keys(), ...egresosMap.keys()]);
+
+  return Array.from(conceptos).map(concepto => ({
+    concepto,
+    ingresos: ingresosMap.get(concepto) || 0,
+    egresos: egresosMap.get(concepto) || 0,
+    balance: (ingresosMap.get(concepto) || 0) - (egresosMap.get(concepto) || 0),
+  }));
+}

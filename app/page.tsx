@@ -2,29 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { getResumenMensual } from '@/lib/supabase';
-import { getNombreMes, formatearMoneda, obtenerAñoActual } from '@/lib/utils';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { getResumenPorConcepto } from '@/lib/supabase';
+import { formatearMoneda, obtenerAñoActual } from '@/lib/utils';
 
 export default function Dashboard() {
   const { usuario, loading: authLoading } = useAuth();
-  const [data, setData] = useState<any[]>([]);
+  const [conceptos, setConceptos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [año, setAño] = useState(obtenerAñoActual());
-
-  const formatTooltip = (value: any) => {
-    if (typeof value === 'number') {
-      return formatearMoneda(value);
-    }
-    return value;
-  };
 
   useEffect(() => {
     async function cargarDatos() {
       if (!usuario) return;
       try {
-        const resumen = await getResumenMensual(usuario.id, año);
-        setData(resumen);
+        const resumen = await getResumenPorConcepto(usuario.id, año);
+        setConceptos(resumen);
       } catch (error) {
         console.error('Error al cargar datos:', error);
       } finally {
@@ -39,14 +31,9 @@ export default function Dashboard() {
     }
   }, [año, usuario, authLoading]);
 
-  const totalIngresos = data.reduce((sum, d) => sum + d.totalIngresos, 0);
-  const totalEgresos = data.reduce((sum, d) => sum + d.totalEgresos, 0);
+  const totalIngresos = conceptos.reduce((sum, c) => sum + c.ingresos, 0);
+  const totalEgresos = conceptos.reduce((sum, c) => sum + c.egresos, 0);
   const balance = totalIngresos - totalEgresos;
-
-  const chartData = data.map(d => ({
-    ...d,
-    mes: getNombreMes(d.mes),
-  }));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#d4e4f7] to-[#fafafa] p-8">
@@ -94,47 +81,70 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Gráficos */}
-        {!loading && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Gráfico de barras */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Ingresos vs Egresos</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="mes" />
-                  <YAxis />
-                  <Tooltip formatter={formatTooltip} />
-                  <Legend />
-                  <Bar dataKey="totalIngresos" fill="#10b981" name="Ingresos" />
-                  <Bar dataKey="totalEgresos" fill="#ef4444" name="Egresos" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Gráfico de línea */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Balance Mensual</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="mes" />
-                  <YAxis />
-                  <Tooltip formatter={formatTooltip} />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="balance"
-                    stroke="#3b82f6"
-                    name="Balance"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+        {/* Resumen por concepto */}
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-[#4a6fa5] to-[#3d5a7f] px-6 py-4">
+            <h2 className="text-xl font-bold text-white">Resumen por Concepto - Año {año}</h2>
           </div>
-        )}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-100 border-b">
+                <tr>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-700">Concepto</th>
+                  <th className="px-6 py-4 text-right font-semibold text-green-600">Ingresos</th>
+                  <th className="px-6 py-4 text-right font-semibold text-red-600">Egresos</th>
+                  <th className="px-6 py-4 text-right font-semibold text-blue-600">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                      Cargando...
+                    </td>
+                  </tr>
+                ) : conceptos.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                      No hay datos disponibles
+                    </td>
+                  </tr>
+                ) : (
+                  conceptos.map((concepto, idx) => (
+                    <tr key={idx} className="border-t hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 font-medium text-gray-800">{concepto.concepto}</td>
+                      <td className="px-6 py-4 text-right font-semibold text-green-600">
+                        {formatearMoneda(concepto.ingresos)}
+                      </td>
+                      <td className="px-6 py-4 text-right font-semibold text-red-600">
+                        {formatearMoneda(concepto.egresos)}
+                      </td>
+                      <td className={`px-6 py-4 text-right font-semibold ${concepto.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatearMoneda(concepto.balance)}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+              {!loading && conceptos.length > 0 && (
+                <tfoot className="bg-gray-50 border-t-2">
+                  <tr>
+                    <td className="px-6 py-4 font-bold text-gray-800">TOTAL</td>
+                    <td className="px-6 py-4 text-right font-bold text-green-600">
+                      {formatearMoneda(totalIngresos)}
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-red-600">
+                      {formatearMoneda(totalEgresos)}
+                    </td>
+                    <td className={`px-6 py-4 text-right font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatearMoneda(balance)}
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
