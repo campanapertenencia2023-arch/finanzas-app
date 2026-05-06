@@ -19,10 +19,12 @@ export default function LoginPage() {
 
     try {
       await login(nombre, password);
-      router.push('/');
+      // Reload para que el AuthContext se actualice con el nuevo usuario
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
     } catch (err: any) {
       setError(err.message || 'Error al iniciar sesión');
-    } finally {
       setLoading(false);
     }
   }
@@ -39,12 +41,6 @@ export default function LoginPage() {
               {error}
             </div>
           )}
-
-          <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-6 text-sm">
-            <p className="font-semibold mb-2">Usuarios disponibles:</p>
-            <p>• Usuario: <strong>julian</strong> | Contraseña: <strong>julian123</strong></p>
-            <p>• Usuario: <strong>paola</strong> | Contraseña: <strong>paola123</strong></p>
-          </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
