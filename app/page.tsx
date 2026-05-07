@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { getResumenPorConcepto } from '@/lib/supabase';
 import { formatearMoneda, obtenerAñoActual } from '@/lib/utils';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function Dashboard() {
   const { usuario, loading: authLoading } = useAuth();
@@ -79,6 +80,92 @@ export default function Dashboard() {
               {loading ? 'Cargando...' : formatearMoneda(balance)}
             </p>
           </div>
+        </div>
+
+        {/* Gráficos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Gráfico de Ingresos por Concepto */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Ingresos por Concepto</h3>
+            {conceptos.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={conceptos.filter(c => c.ingresos > 0).map(c => ({
+                      name: c.concepto,
+                      value: parseFloat(c.ingresos.toString())
+                    }))}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${formatearMoneda(value)}`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {conceptos.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={['#10b981', '#06b6d4', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'][index % 6]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => formatearMoneda(value)} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-gray-500 text-center py-8">Sin datos de ingresos</p>
+            )}
+          </div>
+
+          {/* Gráfico de Egresos por Concepto */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Egresos por Concepto</h3>
+            {conceptos.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={conceptos.filter(c => c.egresos > 0).map(c => ({
+                      name: c.concepto,
+                      value: parseFloat(c.egresos.toString())
+                    }))}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${formatearMoneda(value)}`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {conceptos.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={['#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e'][index % 6]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => formatearMoneda(value)} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-gray-500 text-center py-8">Sin datos de egresos</p>
+            )}
+          </div>
+        </div>
+
+        {/* Gráfico Comparativo */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+          <h3 className="text-lg font-bold text-gray-800 mb-4">Comparativo: Ingresos vs Egresos</h3>
+          {conceptos.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={conceptos}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="concepto" angle={-45} textAnchor="end" height={80} />
+                <YAxis />
+                <Tooltip formatter={(value) => formatearMoneda(value)} />
+                <Legend />
+                <Bar dataKey="ingresos" fill="#10b981" name="Ingresos" />
+                <Bar dataKey="egresos" fill="#ef4444" name="Egresos" />
+                <Bar dataKey="balance" fill="#3b82f6" name="Balance" />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-gray-500 text-center py-8">Sin datos disponibles</p>
+          )}
         </div>
 
         {/* Resumen por concepto */}
