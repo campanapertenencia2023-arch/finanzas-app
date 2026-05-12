@@ -1,11 +1,28 @@
 import { google } from 'googleapis';
-import * as path from 'path';
 
-// Configurar autenticación con el archivo de credenciales
-const auth = new google.auth.GoogleAuth({
-  keyFile: path.join(process.cwd(), 'credentials.json'),
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-});
+// Configurar autenticación con credenciales desde variable de entorno
+let auth: any;
+
+if (process.env.GOOGLE_CREDENTIALS_JSON) {
+  // En producción (Vercel), usar variable de entorno
+  const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+  auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
+} else {
+  // En desarrollo local, intentar usar el archivo
+  try {
+    const path = require('path');
+    auth = new google.auth.GoogleAuth({
+      keyFile: path.join(process.cwd(), 'credentials.json'),
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+  } catch (error) {
+    console.error('Error: No Google credentials found. Set GOOGLE_CREDENTIALS_JSON environment variable.');
+    throw error;
+  }
+}
 
 const sheets = google.sheets({ version: 'v4', auth });
 
