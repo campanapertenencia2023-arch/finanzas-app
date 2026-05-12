@@ -5,19 +5,7 @@
 :root {
   --background: #0f172a;
   --foreground: #f1f5f9;
-  --card: #1e293b;
-  --card-foreground: #f1f5f9;
-  --primary: #10b981;
-  --primary-foreground: #0f172a;
-  --secondary: #06b6d4;
-  --secondary-foreground: #0f172a;
-  --muted: #64748b;
-  --muted-foreground: #cbd5e1;
   --border: #334155;
-}
-
-* {
-  border-color: var(--border);
 }
 
 html {
@@ -27,26 +15,10 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: var(--font-geist-mono), 'SFMono-Regular', 'Courier New', Courier, monospace;
-}
-
-/* Smooth transitions */
-* {
-  @apply transition-colors duration-150;
-}
-
-button {
-  @apply font-medium;
-}
-
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -63,35 +35,4 @@ button {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.8);
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-in;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
-  }
 }
