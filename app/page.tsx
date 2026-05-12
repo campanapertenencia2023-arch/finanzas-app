@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { getResumenPorConcepto } from '@/lib/google-sheets';
 import { formatearMoneda, obtenerAñoActual } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Target, MoreVertical } from 'lucide-react';
 
@@ -16,7 +15,9 @@ export default function Dashboard() {
     async function cargarDatos() {
       if (!usuario) return;
       try {
-        const resumen = await getResumenPorConcepto(usuario.id, año);
+        const response = await fetch(`/api/resumen?usuario=${usuario.id}&año=${año}`);
+        if (!response.ok) throw new Error('Error al cargar datos');
+        const resumen = await response.json();
         setConceptos(resumen);
       } catch (error) {
         console.error('Error:', error);
