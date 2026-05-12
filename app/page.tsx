@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { getResumenPorConcepto } from '@/lib/supabase';
 import { formatearMoneda, obtenerAñoActual } from '@/lib/utils';
-import { TrendingUp, TrendingDown, DollarSign, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function Dashboard() {
   const { usuario, loading: authLoading } = useAuth();
@@ -39,119 +39,129 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       {/* Header */}
-      <div className="border-b border-slate-800 px-8 py-8">
-        <h1 className="text-3xl font-light tracking-tight mb-2">Dashboard Financiero</h1>
-        <p className="text-slate-400 text-sm">Análisis de flujos y conceptos</p>
+      <div className="border-b border-slate-800/50 px-8 py-10">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-5xl font-light tracking-tight mb-3">Dashboard Financiero</h1>
+          <p className="text-slate-400 text-base">Resumen de flujos y conceptos financieros</p>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto p-8">
         {/* Year Selector */}
-        <div className="flex items-center gap-6 mb-12">
-          <button
-            onClick={() => setAño(año - 1)}
-            className="p-2 hover:bg-slate-900 rounded transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <span className="text-2xl font-light w-16 text-center">{año}</span>
-          <button
-            onClick={() => setAño(año + 1)}
-            className="p-2 hover:bg-slate-900 rounded transition-colors"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+        <div className="flex items-center justify-between mb-16">
+          <div className="flex items-center gap-8">
+            <button
+              onClick={() => setAño(año - 1)}
+              className="p-3 hover:bg-slate-800 rounded transition-colors duration-200"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <span className="text-4xl font-light w-24 text-center tracking-tight">{año}</span>
+            <button
+              onClick={() => setAño(año + 1)}
+              className="p-3 hover:bg-slate-800 rounded transition-colors duration-200"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           {/* Ingresos */}
-          <div className="border border-slate-800 rounded p-6 hover:border-slate-700 transition-colors">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full mb-4" />
-            <p className="text-slate-400 text-xs uppercase tracking-wider mb-3">Ingresos</p>
-            <h2 className="text-4xl font-light text-emerald-400 tracking-tight">
+          <div className="border border-slate-800 rounded-lg p-8 hover:border-slate-700 transition-colors duration-200 bg-slate-900/30">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-3 h-3 bg-emerald-500 rounded-full" />
+              <p className="text-slate-400 text-sm uppercase tracking-widest font-medium">Ingresos</p>
+            </div>
+            <h2 className="text-5xl font-light text-emerald-400 tracking-tight">
               {loading ? '—' : formatearMoneda(totalIngresos)}
             </h2>
           </div>
 
           {/* Egresos */}
-          <div className="border border-slate-800 rounded p-6 hover:border-slate-700 transition-colors">
-            <div className="w-2 h-2 bg-red-500 rounded-full mb-4" />
-            <p className="text-slate-400 text-xs uppercase tracking-wider mb-3">Egresos</p>
-            <h2 className="text-4xl font-light text-red-400 tracking-tight">
+          <div className="border border-slate-800 rounded-lg p-8 hover:border-slate-700 transition-colors duration-200 bg-slate-900/30">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-3 h-3 bg-red-500 rounded-full" />
+              <p className="text-slate-400 text-sm uppercase tracking-widest font-medium">Egresos</p>
+            </div>
+            <h2 className="text-5xl font-light text-red-400 tracking-tight">
               {loading ? '—' : formatearMoneda(totalEgresos)}
             </h2>
           </div>
 
           {/* Balance */}
-          <div className="border border-slate-800 rounded p-6 hover:border-slate-700 transition-colors">
-            <div className={`w-2 h-2 rounded-full mb-4 ${balance >= 0 ? 'bg-cyan-400' : 'bg-amber-500'}`} />
-            <p className="text-slate-400 text-xs uppercase tracking-wider mb-3">Balance</p>
-            <h2 className={`text-4xl font-light tracking-tight ${balance >= 0 ? 'text-cyan-400' : 'text-amber-400'}`}>
+          <div className="border border-slate-800 rounded-lg p-8 hover:border-slate-700 transition-colors duration-200 bg-slate-900/30">
+            <div className="flex items-center gap-3 mb-6">
+              <div className={`w-3 h-3 rounded-full ${balance >= 0 ? 'bg-cyan-400' : 'bg-amber-500'}`} />
+              <p className="text-slate-400 text-sm uppercase tracking-widest font-medium">Balance</p>
+            </div>
+            <h2 className={`text-5xl font-light tracking-tight ${balance >= 0 ? 'text-cyan-400' : 'text-amber-400'}`}>
               {loading ? '—' : formatearMoneda(balance)}
             </h2>
           </div>
         </div>
 
-        {/* Table */}
+        {/* Table Section */}
         <div>
-          <h3 className="text-sm uppercase tracking-wider text-slate-400 mb-6">Por Concepto</h3>
+          <h3 className="text-base uppercase tracking-widest text-slate-400 mb-8 font-medium">Desglose por Concepto</h3>
 
-          <div className="border border-slate-800 rounded overflow-hidden">
+          <div className="border border-slate-800 rounded-lg overflow-hidden bg-slate-900/20">
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-900 border-b border-slate-800">
-                  <th className="px-6 py-4 text-left text-xs uppercase tracking-wider text-slate-400 font-medium">Concepto</th>
-                  <th className="px-6 py-4 text-right text-xs uppercase tracking-wider text-emerald-400 font-medium">Ingresos</th>
-                  <th className="px-6 py-4 text-right text-xs uppercase tracking-wider text-red-400 font-medium">Egresos</th>
-                  <th className="px-6 py-4 text-right text-xs uppercase tracking-wider text-cyan-400 font-medium">Balance</th>
-                  <th className="px-6 py-4 text-right text-xs uppercase tracking-wider text-slate-400 font-medium">%</th>
+                  <th className="px-8 py-5 text-left text-xs uppercase tracking-widest text-slate-400 font-medium">Concepto</th>
+                  <th className="px-8 py-5 text-right text-xs uppercase tracking-widest text-emerald-400 font-medium">Ingresos</th>
+                  <th className="px-8 py-5 text-right text-xs uppercase tracking-widest text-red-400 font-medium">Egresos</th>
+                  <th className="px-8 py-5 text-right text-xs uppercase tracking-widest text-cyan-400 font-medium">Balance</th>
+                  <th className="px-8 py-5 text-right text-xs uppercase tracking-widest text-slate-400 font-medium">Proporción</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
-                      Cargando...
+                    <td colSpan={5} className="px-8 py-12 text-center text-slate-500 text-base">
+                      Cargando datos...
                     </td>
                   </tr>
                 ) : conceptos.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
-                      Sin datos
+                    <td colSpan={5} className="px-8 py-12 text-center text-slate-500 text-base">
+                      Sin datos registrados
                     </td>
                   </tr>
                 ) : (
                   <>
                     {conceptos.map((concepto, idx) => (
-                      <tr key={idx} className="hover:bg-slate-900/50 transition-colors">
-                        <td className="px-6 py-5 font-light">{concepto.concepto}</td>
-                        <td className="px-6 py-5 text-right font-light text-emerald-400">
+                      <tr key={idx} className="hover:bg-slate-800/30 transition-colors duration-150">
+                        <td className="px-8 py-5 font-light text-base">{concepto.concepto}</td>
+                        <td className="px-8 py-5 text-right font-light text-emerald-400 text-base">
                           {formatearMoneda(concepto.ingresos)}
                         </td>
-                        <td className="px-6 py-5 text-right font-light text-red-400">
+                        <td className="px-8 py-5 text-right font-light text-red-400 text-base">
                           {formatearMoneda(concepto.egresos)}
                         </td>
-                        <td className={`px-6 py-5 text-right font-light ${concepto.balance >= 0 ? 'text-cyan-400' : 'text-amber-400'}`}>
+                        <td className={`px-8 py-5 text-right font-light text-base ${concepto.balance >= 0 ? 'text-cyan-400' : 'text-amber-400'}`}>
                           {formatearMoneda(concepto.balance)}
                         </td>
-                        <td className="px-6 py-5 text-right text-slate-400 font-light">
-                          {totalIngresos > 0 ? ((concepto.ingresos / totalIngresos) * 100).toFixed(0) : '0'}%
+                        <td className="px-8 py-5 text-right text-slate-400 font-light text-base">
+                          {totalIngresos > 0 ? ((concepto.ingresos / totalIngresos) * 100).toFixed(1) : '0'}%
                         </td>
                       </tr>
                     ))}
                     {conceptos.length > 0 && (
-                      <tr className="bg-slate-900 border-t-2 border-slate-700 font-medium">
-                        <td className="px-6 py-5">Total</td>
-                        <td className="px-6 py-5 text-right text-emerald-400">
+                      <tr className="bg-slate-900/50 border-t-2 border-slate-700">
+                        <td className="px-8 py-5 font-medium text-base">Total</td>
+                        <td className="px-8 py-5 text-right text-emerald-400 font-medium text-base">
                           {formatearMoneda(totalIngresos)}
                         </td>
-                        <td className="px-6 py-5 text-right text-red-400">
+                        <td className="px-8 py-5 text-right text-red-400 font-medium text-base">
                           {formatearMoneda(totalEgresos)}
                         </td>
-                        <td className={`px-6 py-5 text-right ${balance >= 0 ? 'text-cyan-400' : 'text-amber-400'}`}>
+                        <td className={`px-8 py-5 text-right font-medium text-base ${balance >= 0 ? 'text-cyan-400' : 'text-amber-400'}`}>
                           {formatearMoneda(balance)}
                         </td>
-                        <td className="px-6 py-5 text-right text-slate-400">100%</td>
+                        <td className="px-8 py-5 text-right text-slate-400 font-medium text-base">100%</td>
                       </tr>
                     )}
                   </>
@@ -161,10 +171,10 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Footer Info */}
-        <div className="flex justify-between mt-12 pt-8 border-t border-slate-800 text-xs text-slate-500">
-          <span>Año {año}</span>
-          <span>Última actualización: hoy</span>
+        {/* Footer */}
+        <div className="flex justify-between items-center mt-16 pt-8 border-t border-slate-800">
+          <span className="text-slate-500 text-sm">Período: {año}</span>
+          <span className="text-slate-600 text-xs">Actualizado automáticamente</span>
         </div>
       </div>
     </div>
