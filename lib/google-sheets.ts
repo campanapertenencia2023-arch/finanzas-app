@@ -181,3 +181,36 @@ export async function agregarConcepto(
     throw error;
   }
 }
+
+/**
+ * Valida credenciales de usuario desde Google Sheets
+ */
+export async function validarUsuario(
+  nombre: string,
+  password: string
+): Promise<{ id: string; nombre: string } | null> {
+  try {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: 'Usuarios!A:C',
+    });
+
+    const rows = response.data.values || [];
+
+    // Saltar header (primera fila)
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[0] === nombre && row[1] === password) {
+        return {
+          id: row[0], // usuario es el ID
+          nombre: row[0],
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error al validar usuario:', error);
+    return null;
+  }
+}
