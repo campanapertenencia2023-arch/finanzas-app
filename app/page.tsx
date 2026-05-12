@@ -56,7 +56,7 @@ export default function Dashboard() {
   const balancePercentage = totalIngresos > 0 ? (balance / totalIngresos) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black p-4 md:p-8 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black p-6 md:p-12 overflow-hidden">
       {/* Animated background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-10 w-80 h-80 bg-emerald-500/20 rounded-full blur-3xl -mr-40 animate-pulse" />
@@ -71,18 +71,18 @@ export default function Dashboard() {
         animate="visible"
       >
         {/* Hero Header */}
-        <motion.div variants={itemVariants} className="mb-12">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-800 via-slate-800/50 to-transparent border border-slate-700/50 p-8 md:p-12">
+        <motion.div variants={itemVariants} className="mb-16">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-800 via-slate-800/50 to-transparent border border-slate-700/50 p-12 md:p-16">
             <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_1px_1px,#ffffff_1px,transparent_1px)] bg-[size:20px_20px]" />
             <div className="relative">
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-6">
                 <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-400/50" />
                 <span className="text-sm font-semibold text-emerald-400 uppercase tracking-wider">Dashboard Financiero</span>
               </div>
-              <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-emerald-200 via-cyan-200 to-blue-200 bg-clip-text text-transparent mb-3">
+              <h1 className="text-6xl md:text-7xl font-black bg-gradient-to-r from-emerald-200 via-cyan-200 to-blue-200 bg-clip-text text-transparent mb-4">
                 Tu Salud Financiera
               </h1>
-              <p className="text-slate-400 text-lg max-w-2xl">
+              <p className="text-slate-400 text-xl max-w-2xl">
                 Análisis completo de tus ingresos y egresos con visualización avanzada
               </p>
             </div>
@@ -90,7 +90,7 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Year Selector */}
-        <motion.div variants={itemVariants} className="mb-12 flex justify-center">
+        <motion.div variants={itemVariants} className="mb-20 flex justify-center">
           <div className="relative bg-gradient-to-r from-slate-800/40 to-slate-700/40 backdrop-blur-xl border border-slate-600/30 rounded-2xl p-6 hover:border-slate-500/50 transition-all">
             <div className="flex items-center gap-8">
               <motion.button
@@ -122,27 +122,27 @@ export default function Dashboard() {
         </motion.div>
 
         {/* KPI Cards */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           {/* Ingresos */}
           <div className="group relative">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-2xl blur-lg opacity-0 group-hover:opacity-50 transition-all duration-500" />
-            <div className="relative bg-gradient-to-br from-slate-800 to-slate-800/50 backdrop-blur-xl border border-emerald-500/20 group-hover:border-emerald-500/40 rounded-2xl p-8 overflow-hidden transition-all">
+            <div className="relative bg-gradient-to-br from-slate-800 to-slate-800/50 backdrop-blur-xl border border-emerald-500/20 group-hover:border-emerald-500/40 rounded-3xl p-12 overflow-hidden transition-all">
               <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-emerald-500 to-transparent" />
-              <div className="relative">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <p className="text-slate-400 text-sm font-medium mb-2">INGRESOS TOTALES</p>
-                    <h3 className="text-4xl md:text-5xl font-black text-emerald-400 leading-tight">
+              <div className="relative space-y-8">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="text-emerald-400/80 text-xs font-bold uppercase tracking-widest mb-3">Ingresos Totales</p>
+                    <h3 className="text-6xl md:text-7xl font-black text-emerald-400 leading-none">
                       {loading ? '---' : formatearMoneda(totalIngresos)}
                     </h3>
                   </div>
-                  <div className="p-4 bg-emerald-500/20 rounded-2xl border border-emerald-500/30 group-hover:scale-110 transition-transform">
-                    <TrendingUp className="w-8 h-8 text-emerald-400" />
+                  <div className="p-5 bg-emerald-500/20 rounded-2xl border border-emerald-500/30 group-hover:scale-110 transition-transform flex-shrink-0">
+                    <TrendingUp className="w-10 h-10 text-emerald-400" />
                   </div>
                 </div>
-                <div className="flex items-center justify-between pt-6 border-t border-slate-700/50">
-                  <span className="text-xs text-slate-500">Año {año}</span>
-                  <span className="text-xs font-semibold text-emerald-400">+12.5%</span>
+                <div className="flex items-center justify-between pt-8 border-t border-slate-700/50">
+                  <span className="text-sm text-slate-400">Año {año}</span>
+                  <span className="text-sm font-bold text-emerald-400">+12.5%</span>
                 </div>
               </div>
             </div>
@@ -151,23 +151,23 @@ export default function Dashboard() {
           {/* Egresos */}
           <div className="group relative">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl blur-lg opacity-0 group-hover:opacity-50 transition-all duration-500" />
-            <div className="relative bg-gradient-to-br from-slate-800 to-slate-800/50 backdrop-blur-xl border border-red-500/20 group-hover:border-red-500/40 rounded-2xl p-8 overflow-hidden transition-all">
+            <div className="relative bg-gradient-to-br from-slate-800 to-slate-800/50 backdrop-blur-xl border border-red-500/20 group-hover:border-red-500/40 rounded-3xl p-12 overflow-hidden transition-all">
               <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-red-500 to-transparent" />
-              <div className="relative">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <p className="text-slate-400 text-sm font-medium mb-2">EGRESOS TOTALES</p>
-                    <h3 className="text-4xl md:text-5xl font-black text-red-400 leading-tight">
+              <div className="relative space-y-8">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className="text-red-400/80 text-xs font-bold uppercase tracking-widest mb-3">Egresos Totales</p>
+                    <h3 className="text-6xl md:text-7xl font-black text-red-400 leading-none">
                       {loading ? '---' : formatearMoneda(totalEgresos)}
                     </h3>
                   </div>
-                  <div className="p-4 bg-red-500/20 rounded-2xl border border-red-500/30 group-hover:scale-110 transition-transform">
-                    <TrendingDown className="w-8 h-8 text-red-400" />
+                  <div className="p-5 bg-red-500/20 rounded-2xl border border-red-500/30 group-hover:scale-110 transition-transform flex-shrink-0">
+                    <TrendingDown className="w-10 h-10 text-red-400" />
                   </div>
                 </div>
-                <div className="flex items-center justify-between pt-6 border-t border-slate-700/50">
-                  <span className="text-xs text-slate-500">Año {año}</span>
-                  <span className="text-xs font-semibold text-red-400">-8.3%</span>
+                <div className="flex items-center justify-between pt-8 border-t border-slate-700/50">
+                  <span className="text-sm text-slate-400">Año {año}</span>
+                  <span className="text-sm font-bold text-red-400">-8.3%</span>
                 </div>
               </div>
             </div>
@@ -176,32 +176,34 @@ export default function Dashboard() {
           {/* Balance */}
           <div className="group relative">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur-lg opacity-0 group-hover:opacity-50 transition-all duration-500" />
-            <div className="relative bg-gradient-to-br from-slate-800 to-slate-800/50 backdrop-blur-xl border border-blue-500/20 group-hover:border-blue-500/40 rounded-2xl p-8 overflow-hidden transition-all">
+            <div className="relative bg-gradient-to-br from-slate-800 to-slate-800/50 backdrop-blur-xl border border-blue-500/20 group-hover:border-blue-500/40 rounded-3xl p-12 overflow-hidden transition-all">
               <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-blue-500 to-transparent" />
-              <div className="relative">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <p className="text-slate-400 text-sm font-medium mb-2">BALANCE NETO</p>
-                    <h3 className={`text-4xl md:text-5xl font-black leading-tight ${
+              <div className="relative space-y-8">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${
+                      balance >= 0 ? 'text-blue-400/80' : 'text-amber-400/80'
+                    }`}>Balance Neto</p>
+                    <h3 className={`text-6xl md:text-7xl font-black leading-none ${
                       balance >= 0 ? 'text-blue-400' : 'text-amber-400'
                     }`}>
                       {loading ? '---' : formatearMoneda(balance)}
                     </h3>
                   </div>
-                  <div className={`p-4 rounded-2xl border transition-transform group-hover:scale-110 ${
+                  <div className={`p-5 rounded-2xl border transition-transform group-hover:scale-110 flex-shrink-0 ${
                     balance >= 0
                       ? 'bg-blue-500/20 border-blue-500/30'
                       : 'bg-amber-500/20 border-amber-500/30'
                   }`}>
-                    <BarChart3 className={`w-8 h-8 ${balance >= 0 ? 'text-blue-400' : 'text-amber-400'}`} />
+                    <BarChart3 className={`w-10 h-10 ${balance >= 0 ? 'text-blue-400' : 'text-amber-400'}`} />
                   </div>
                 </div>
-                <div className="space-y-3 pt-6 border-t border-slate-700/50">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Ratio Ingresos/Egresos</span>
-                    <span className="font-semibold text-slate-200">{totalEgresos > 0 ? (totalIngresos / totalEgresos).toFixed(2) : '0.00'}x</span>
+                <div className="space-y-4 pt-8 border-t border-slate-700/50">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-slate-400">Ratio Ingresos/Egresos</span>
+                    <span className="text-sm font-bold text-slate-200">{totalEgresos > 0 ? (totalIngresos / totalEgresos).toFixed(2) : '0.00'}x</span>
                   </div>
-                  <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
                     <div className={`h-full bg-gradient-to-r ${
                       balance >= 0
                         ? 'from-blue-500 to-cyan-400'
@@ -215,7 +217,7 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Charts */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
           {/* Ingresos Distribution */}
           <div className="group relative">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-600/30 to-cyan-600/30 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
@@ -304,7 +306,7 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Comparative Bar Chart */}
-        <motion.div variants={itemVariants} className="group relative mb-12">
+        <motion.div variants={itemVariants} className="group relative mb-16">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/30 to-purple-600/30 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
           <div className="relative bg-gradient-to-br from-slate-800/80 to-slate-800/40 backdrop-blur-xl border border-slate-700/50 group-hover:border-blue-500/30 rounded-2xl p-8 transition-all">
             <div className="mb-6">
@@ -360,23 +362,23 @@ export default function Dashboard() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-slate-700/30 border-b border-slate-700/50">
-                    <th className="px-6 py-4 text-left font-bold text-slate-200">Concepto</th>
-                    <th className="px-6 py-4 text-right font-bold text-emerald-400">Ingresos</th>
-                    <th className="px-6 py-4 text-right font-bold text-red-400">Egresos</th>
-                    <th className="px-6 py-4 text-right font-bold text-blue-400">Balance</th>
-                    <th className="px-6 py-4 text-right font-bold text-slate-300">%</th>
+                    <th className="px-8 py-5 text-left font-bold text-slate-200 text-lg">Concepto</th>
+                    <th className="px-8 py-5 text-right font-bold text-emerald-400 text-lg">Ingresos</th>
+                    <th className="px-8 py-5 text-right font-bold text-red-400 text-lg">Egresos</th>
+                    <th className="px-8 py-5 text-right font-bold text-blue-400 text-lg">Balance</th>
+                    <th className="px-8 py-5 text-right font-bold text-slate-300 text-lg">%</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-700/30">
                   {loading ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-slate-500">
+                      <td colSpan={5} className="px-8 py-6 text-center text-slate-500 text-lg">
                         Cargando datos...
                       </td>
                     </tr>
                   ) : conceptos.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-slate-500">
+                      <td colSpan={5} className="px-8 py-6 text-center text-slate-500 text-lg">
                         No hay datos disponibles
                       </td>
                     </tr>
@@ -388,15 +390,15 @@ export default function Dashboard() {
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: idx * 0.05 }}
-                          className="hover:bg-slate-700/20 transition-colors duration-200 group/row"
+                          className="hover:bg-slate-700/20 transition-colors duration-200 group/row border-b border-slate-700/20"
                         >
-                          <td className="px-6 py-4 font-bold text-slate-100 group-hover/row:text-slate-50">{concepto.concepto}</td>
-                          <td className="px-6 py-4 text-right font-bold text-emerald-400">{formatearMoneda(concepto.ingresos)}</td>
-                          <td className="px-6 py-4 text-right font-bold text-red-400">{formatearMoneda(concepto.egresos)}</td>
-                          <td className={`px-6 py-4 text-right font-bold ${concepto.balance >= 0 ? 'text-blue-400' : 'text-amber-400'}`}>
+                          <td className="px-8 py-5 font-bold text-slate-100 text-base group-hover/row:text-slate-50">{concepto.concepto}</td>
+                          <td className="px-8 py-5 text-right font-bold text-emerald-400 text-lg">{formatearMoneda(concepto.ingresos)}</td>
+                          <td className="px-8 py-5 text-right font-bold text-red-400 text-lg">{formatearMoneda(concepto.egresos)}</td>
+                          <td className={`px-8 py-5 text-right font-bold text-lg ${concepto.balance >= 0 ? 'text-blue-400' : 'text-amber-400'}`}>
                             {formatearMoneda(concepto.balance)}
                           </td>
-                          <td className="px-6 py-4 text-right text-slate-400">
+                          <td className="px-8 py-5 text-right text-slate-400 text-base">
                             {totalIngresos > 0 ? ((concepto.ingresos / totalIngresos) * 100).toFixed(1) : '0'}%
                           </td>
                         </motion.tr>
@@ -408,13 +410,13 @@ export default function Dashboard() {
                           transition={{ delay: conceptos.length * 0.05 }}
                           className="bg-gradient-to-r from-emerald-500/10 to-emerald-400/5 border-t-2 border-emerald-500/30 font-bold"
                         >
-                          <td className="px-6 py-4 text-slate-100">TOTAL GENERAL</td>
-                          <td className="px-6 py-4 text-right text-emerald-400 text-lg">{formatearMoneda(totalIngresos)}</td>
-                          <td className="px-6 py-4 text-right text-red-400 text-lg">{formatearMoneda(totalEgresos)}</td>
-                          <td className={`px-6 py-4 text-right text-lg ${balance >= 0 ? 'text-blue-400' : 'text-amber-400'}`}>
+                          <td className="px-8 py-6 text-slate-100 text-base">TOTAL GENERAL</td>
+                          <td className="px-8 py-6 text-right text-emerald-400 text-xl font-black">{formatearMoneda(totalIngresos)}</td>
+                          <td className="px-8 py-6 text-right text-red-400 text-xl font-black">{formatearMoneda(totalEgresos)}</td>
+                          <td className={`px-8 py-6 text-right text-xl font-black ${balance >= 0 ? 'text-blue-400' : 'text-amber-400'}`}>
                             {formatearMoneda(balance)}
                           </td>
-                          <td className="px-6 py-4 text-right text-slate-300">100%</td>
+                          <td className="px-8 py-6 text-right text-slate-300 text-base">100%</td>
                         </motion.tr>
                       )}
                     </>
