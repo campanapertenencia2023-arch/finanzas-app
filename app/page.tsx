@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { getResumenPorConcepto } from '@/lib/supabase';
+import { getResumenPorConcepto } from '@/lib/google-sheets';
 import { formatearMoneda, obtenerAñoActual } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Target, MoreVertical } from 'lucide-react';
 
