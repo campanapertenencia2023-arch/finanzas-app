@@ -230,7 +230,7 @@ export default function Dashboard() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => formatearMoneda(value)} />
+                    <Tooltip formatter={(value: any) => formatearMoneda(Number(value) || 0)} />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
@@ -268,7 +268,7 @@ export default function Dashboard() {
                         <Cell key={`cell-${index}`} fill={EXPENSE_COLORS[index % EXPENSE_COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => formatearMoneda(value)} />
+                    <Tooltip formatter={(value: any) => formatearMoneda(Number(value) || 0)} />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
@@ -293,7 +293,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
                   <XAxis dataKey="concepto" angle={-45} textAnchor="end" height={80} stroke="#94a3b8" />
                   <YAxis stroke="#94a3b8" />
-                  <Tooltip formatter={(value) => formatearMoneda(value)} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }} />
+                  <Tooltip formatter={(value: any) => formatearMoneda(Number(value) || 0)} contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }} />
                   <Legend />
                   <Bar dataKey="ingresos" fill="#10b981" name="Ingresos" radius={[8, 8, 0, 0]} />
                   <Bar dataKey="egresos" fill="#ef4444" name="Egresos" radius={[8, 8, 0, 0]} />
