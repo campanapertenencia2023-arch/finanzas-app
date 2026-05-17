@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { login } from '@/lib/auth';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { FormInput } from '@/components/ui/FormInput';
+import { LoadingState } from '@/components/ui/LoadingState';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [nombre, setNombre] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,7 +20,7 @@ export default function LoginPage() {
 
     try {
       await login(nombre, password);
-      // Reload para que el AuthContext se actualice con el nuevo usuario
+      // Redirect al dashboard
       setTimeout(() => {
         window.location.href = '/';
       }, 500);
@@ -30,54 +31,56 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#d4e4f7] to-[#fafafa] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Finanzas</h1>
-          <p className="text-gray-600 mb-6">Inicia sesión en tu cuenta</p>
+        <Card variant="premium">
+          <div className="text-center mb-8">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
+              💰 Finanzas
+            </h1>
+            <p className="text-slate-400">Inicia sesión en tu cuenta</p>
+          </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-              {error}
+            <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 mb-6">
+              <p className="text-red-400 text-sm font-semibold">⚠️ {error}</p>
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Usuario
-              </label>
-              <input
-                type="text"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a6fa5] focus:border-transparent"
-                required
-              />
-            </div>
+          <form onSubmit={handleLogin} className="space-y-5">
+            <FormInput
+              label="Usuario"
+              type="text"
+              placeholder="Ingresa tu usuario"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contraseña
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a6fa5] focus:border-transparent"
-                required
-              />
-            </div>
+            <FormInput
+              label="Contraseña"
+              type="password"
+              placeholder="Ingresa tu contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
 
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              size="lg"
+              isLoading={loading}
               disabled={loading}
-              className="w-full px-4 py-2 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f] disabled:bg-gray-400 font-semibold"
             >
               {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-            </button>
+            </Button>
           </form>
-        </div>
+
+          <div className="mt-6 pt-6 border-t border-slate-700/30 text-center text-slate-400 text-sm">
+            <p>Usuarios de prueba: <span className="text-cyan-400 font-semibold">julian</span> o <span className="text-cyan-400 font-semibold">paola</span></p>
+          </div>
+        </Card>
       </div>
     </div>
   );

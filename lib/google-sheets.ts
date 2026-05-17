@@ -133,6 +133,45 @@ export async function agregarTransaccion(datos: Transaccion): Promise<void> {
 }
 
 /**
+ * Obtiene transacciones filtradas por usuario, año y tipo
+ */
+export async function obtenerTransacciones(
+  usuario: string,
+  año: number,
+  tipo?: 'ingreso' | 'egreso'
+): Promise<any[]> {
+  try {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: 'Transacciones!A:F',
+    });
+
+    const rows = response.data.values || [];
+    const transacciones = rows.slice(1).filter((row: any[]) => {
+      if (!row[0] || !row[1] || !row[5]) return false;
+
+      const esUsuarioOk = row[0] === usuario;
+      const esAñoOk = parseInt(row[5]) === año;
+      const esTipoOk = !tipo || row[1] === tipo;
+
+      return esUsuarioOk && esAñoOk && esTipoOk;
+    });
+
+    return transacciones.map((row: any[]) => ({
+      usuario: row[0],
+      tipo: row[1],
+      fecha: row[2],
+      concepto: row[3],
+      monto: parseFloat(row[4]) || 0,
+      año: parseInt(row[5]),
+    }));
+  } catch (error) {
+    console.error('Error al obtener transacciones:', error);
+    return [];
+  }
+}
+
+/**
  * Obtiene todos los conceptos de un usuario
  */
 export async function getConceptos(
