@@ -1,15 +1,23 @@
-import { validarUsuario } from './google-sheets';
 import type { UsuarioLogueado } from './types';
 
 const STORAGE_KEY = 'usuario_actual';
 
 export async function login(nombre: string, password: string): Promise<UsuarioLogueado> {
-  // Validar usuario contra Google Sheets
-  const usuario = await validarUsuario(nombre, password);
+  // Validar usuario contra Google Sheets via API
+  const response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ nombre, password }),
+  });
 
-  if (!usuario) {
-    throw new Error('Usuario o contraseña incorrectos');
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Usuario o contraseña incorrectos');
   }
+
+  const usuario = await response.json();
 
   // Guardar en localStorage
   localStorage.setItem(STORAGE_KEY, JSON.stringify(usuario));
