@@ -1,26 +1,25 @@
-import { supabase } from './supabase';
 import type { UsuarioLogueado } from './types';
 
 const STORAGE_KEY = 'usuario_actual';
 
 export async function login(nombre: string, password: string): Promise<UsuarioLogueado> {
-  const { data, error } = await supabase
-    .from('usuarios')
-    .select('id, nombre, password')
-    .eq('nombre', nombre)
-    .single();
+  // Validar usuario contra Google Sheets via API
+  const response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ nombre, password }),
+  });
 
-  if (error || !data) {
-    throw new Error('Usuario o contraseña incorrectos');
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Usuario o contraseña incorrectos');
   }
 
-  // Verificar contraseña (en un app real, usar bcrypt)
-  if (data.password !== password) {
-    throw new Error('Usuario o contraseña incorrectos');
-  }
+  const usuario = await response.json();
 
   // Guardar en localStorage
-  const usuario: UsuarioLogueado = { id: data.id, nombre: data.nombre };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(usuario));
 
   return usuario;

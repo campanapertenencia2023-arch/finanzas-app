@@ -1,63 +1,46 @@
 'use client';
 
-import React, { ReactNode, ReactElement } from 'react';
+import React, { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
-  fallback?: ReactElement;
+  fallback?: ReactNode;
 }
 
 interface State {
   hasError: boolean;
-  error: Error | null;
+  error?: Error;
 }
 
 export class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-    };
+    this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return {
-      hasError: true,
-      error,
-    };
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
-            <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 border border-slate-700/30 rounded-2xl p-8 max-w-md backdrop-blur-xl">
-              <div className="text-red-400 text-4xl mb-4">⚠️</div>
-              <h2 className="text-2xl font-bold text-slate-100 mb-2">Algo salió mal</h2>
-              <p className="text-slate-400 mb-4">
-                Ocurrió un error inesperado. Por favor, intenta recargar la página.
+          <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-8">
+            <div className="bg-red-500/10 border border-red-500/50 rounded-2xl p-8 max-w-md text-center">
+              <h1 className="text-2xl font-bold text-red-400 mb-2">⚠️ Error</h1>
+              <p className="text-slate-300 mb-4">
+                {this.state.error?.message || 'Algo salió mal. Por favor intenta recargar la página.'}
               </p>
-              {this.state.error && (
-                <details className="text-xs text-slate-500 mb-4">
-                  <summary className="cursor-pointer font-semibold text-slate-300">
-                    Detalles del error
-                  </summary>
-                  <pre className="mt-2 p-2 bg-slate-900/50 rounded border border-slate-700/30 overflow-auto">
-                    {this.state.error.toString()}
-                  </pre>
-                </details>
-              )}
               <button
                 onClick={() => window.location.reload()}
-                className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
+                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors"
               >
-                Recargar página
+                Recargar Página
               </button>
             </div>
           </div>

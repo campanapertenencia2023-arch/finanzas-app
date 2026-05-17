@@ -2,347 +2,170 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { getIngresos, getEgresos } from '@/lib/supabase';
-import { formatearMoneda, getNombreMes, obtenerAñoActual } from '@/lib/utils';
-import jsPDF from 'jspdf';
-import { writeFile } from 'xlsx';
-import * as XLSX from 'xlsx';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { formatearMoneda, obtenerAñoActual } from '@/lib/utils';
+import type { ReporteAnalytics } from '@/lib/types';
+import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Target } from 'lucide-react';
 
 export default function ReportesPage() {
   const { usuario, loading: authLoading } = useAuth();
   const [año, setAño] = useState(obtenerAñoActual());
-  const [ingresos, setIngresos] = useState<any[]>([]);
-  const [egresos, setEgresos] = useState<any[]>([]);
+  const [reporte, setReporte] = useState<ReporteAnalytics | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function cargarDatos() {
-    if (!usuario) return;
+  useEffect(() => {
+    if (!authLoading && usuario) {
+      cargarReporte();
+    }
+  }, [año, usuario, authLoading]);
+
+  async function cargarReporte() {
     setLoading(true);
     try {
-      const [ing, egr] = await Promise.all([
-        getIngresos(usuario.id, undefined, año),
-        getEgresos(usuario.id, undefined, año),
-      ]);
-      setIngresos(ing);
-      setEgresos(egr);
+      const response = await fetch(`/api/reportes?usuario=${usuario?.id}&año=${año}`);
+      if (!response.ok) throw new Error('Error al cargar reporte');
+      const data = await response.json();
+      setReporte(data.data);
     } catch (error) {
-      console.error('Error al cargar datos:', error);
+      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    if (!authLoading && usuario) {
-      cargarDatos();
-    }
-  }, [año, usuario, authLoading]);
-
-  const totalIngresos = ingresos.reduce((sum, i) => sum + parseFloat(i.monto), 0);
-  const totalEgresos = egresos.reduce((sum, e) => sum + parseFloat(e.monto), 0);
-
-  function exportarPDF() {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    let yPosition = 20;
-
-    // Encabezado
-    doc.setFontSize(18);
-    doc.text('Reporte Financiero', pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 10;
-
-    doc.setFontSize(12);
-    doc.text(`Año: ${año}`, pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 10;
-
-    doc.text(`Generado: ${new Date().toLocaleDateString('es-CO')}`, pageWidth / 2, yPosition, {
-      align: 'center',
-    });
-    yPosition += 15;
-
-    // Resumen
-    doc.setFontSize(12);
-    doc.text('RESUMEN', 20, yPosition);
-    yPosition += 10;
-
-    doc.setFontSize(10);
-    doc.text(`Total Ingresos: ${formatearMoneda(totalIngresos)}`, 20, yPosition);
-    yPosition += 8;
-    doc.text(`Total Egresos: ${formatearMoneda(totalEgresos)}`, 20, yPosition);
-    yPosition += 8;
-    doc.text(
-      `Balance: ${formatearMoneda(totalIngresos - totalEgresos)}`,
-      20,
-      yPosition
-    );
-    yPosition += 15;
-
-    // Tabla de ingresos
-    doc.setFontSize(12);
-    doc.text('INGRESOS POR MES Y CONCEPTO', 20, yPosition);
-    yPosition += 10;
-
-    doc.setFontSize(9);
-    const ingresosPorMes = Array.from({ length: 12 }, (_, i) => {
-      const mes = i + 1;
-      const mesIngresos = ingresos.filter(ing => ing.mes === mes);
-      const total = mesIngresos.reduce((sum, ing) => sum + parseFloat(ing.monto), 0);
-      return { mes: getNombreMes(mes), ingresos: mesIngresos, total };
-    });
-
-    ingresosPorMes.forEach(({ mes, ingresos: mesIngresos, total }) => {
-      if (mesIngresos.length > 0) {
-        doc.text(`${mes}:`, 20, yPosition);
-        yPosition += 6;
-        mesIngresos.forEach(ing => {
-          doc.text(
-            `  ${ing.conceptos_ingresos.nombre}: ${formatearMoneda(ing.monto)}`,
-            25,
-            yPosition
-          );
-          yPosition += 6;
-        });
-        doc.text(`  Subtotal: ${formatearMoneda(total)}`, 25, yPosition);
-        yPosition += 8;
-
-        if (yPosition > pageHeight - 20) {
-          doc.addPage();
-          yPosition = 20;
-        }
-      }
-    });
-
-    yPosition += 10;
-    if (yPosition > pageHeight - 50) {
-      doc.addPage();
-      yPosition = 20;
-    }
-
-    // Tabla de egresos
-    doc.setFontSize(12);
-    doc.text('EGRESOS POR MES Y CONCEPTO', 20, yPosition);
-    yPosition += 10;
-
-    doc.setFontSize(9);
-    const egresosPorMes = Array.from({ length: 12 }, (_, i) => {
-      const mes = i + 1;
-      const mesEgresos = egresos.filter(egr => egr.mes === mes);
-      const total = mesEgresos.reduce((sum, egr) => sum + parseFloat(egr.monto), 0);
-      return { mes: getNombreMes(mes), egresos: mesEgresos, total };
-    });
-
-    egresosPorMes.forEach(({ mes, egresos: mesEgresos, total }) => {
-      if (mesEgresos.length > 0) {
-        doc.text(`${mes}:`, 20, yPosition);
-        yPosition += 6;
-        mesEgresos.forEach(egr => {
-          doc.text(
-            `  ${egr.conceptos_egresos.nombre}: ${formatearMoneda(egr.monto)}`,
-            25,
-            yPosition
-          );
-          yPosition += 6;
-        });
-        doc.text(`  Subtotal: ${formatearMoneda(total)}`, 25, yPosition);
-        yPosition += 8;
-
-        if (yPosition > pageHeight - 20) {
-          doc.addPage();
-          yPosition = 20;
-        }
-      }
-    });
-
-    doc.save(`reporte-finanzas-${año}.pdf`);
-  }
-
-  function exportarExcel() {
-    const workbook = XLSX.utils.book_new();
-
-    // Hoja de resumen
-    const resumen = [
-      ['Reporte Financiero', año],
-      ['Generado:', new Date().toLocaleDateString('es-CO')],
-      [],
-      ['Total Ingresos', totalIngresos],
-      ['Total Egresos', totalEgresos],
-      ['Balance', totalIngresos - totalEgresos],
-    ];
-    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(resumen), 'Resumen');
-
-    // Hoja de ingresos
-    const datosIngresos = ingresos.map(ing => [
-      getNombreMes(ing.mes),
-      ing.año,
-      ing.conceptos_ingresos.nombre,
-      ing.monto,
-      ing.descripcion || '',
-    ]);
-    const headerIngresos = ['Mes', 'Año', 'Concepto', 'Monto', 'Descripción'];
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.aoa_to_sheet([headerIngresos, ...datosIngresos]),
-      'Ingresos'
-    );
-
-    // Hoja de egresos
-    const datosEgresos = egresos.map(egr => [
-      getNombreMes(egr.mes),
-      egr.año,
-      egr.conceptos_egresos.nombre,
-      egr.monto,
-      egr.descripcion || '',
-    ]);
-    const headerEgresos = ['Mes', 'Año', 'Concepto', 'Monto', 'Descripción'];
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.aoa_to_sheet([headerEgresos, ...datosEgresos]),
-      'Egresos'
-    );
-
-    XLSX.writeFile(workbook, `reporte-finanzas-${año}.xlsx`);
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">Reportes Financieros</h1>
-
-        {/* Selector de año */}
-        <div className="mb-8 flex gap-4 items-center">
-          <label className="text-lg font-semibold text-gray-700">Selecciona año:</label>
-          <select
-            value={año}
-            onChange={(e) => setAño(parseInt(e.target.value))}
-            className="px-4 py-2 border rounded-lg text-lg"
-          >
-            {Array.from({ length: 5 }, (_, i) => año - 2 + i).map(a => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
-          </select>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="border-b border-slate-700/30 pb-8 mb-8">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+            📊 Reportes
+          </h1>
+          <p className="text-slate-400">Análisis y estadísticas de tus finanzas</p>
         </div>
 
-        {/* Opciones de exportación */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Exportar Reporte</h2>
-          <div className="flex gap-4">
-            <button
-              onClick={exportarPDF}
-              disabled={loading}
-              className="px-6 py-3 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f] disabled:bg-gray-400"
-            >
-              📄 Descargar PDF
-            </button>
-            <button
-              onClick={exportarExcel}
-              disabled={loading}
-              className="px-6 py-3 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f] disabled:bg-gray-400"
-            >
-              📊 Descargar Excel
-            </button>
+        {/* Year Selector */}
+        <Card variant="premium" className="mb-8">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-300 font-semibold uppercase">Período</span>
+            <div className="flex items-center gap-4">
+              <button onClick={() => setAño(año - 1)} className="p-2 hover:bg-slate-700/40 rounded-lg transition">
+                <ChevronLeft className="w-5 h-5 text-blue-400" />
+              </button>
+              <span className="text-4xl font-bold w-20 text-center text-cyan-400">{año}</span>
+              <button onClick={() => setAño(año + 1)} className="p-2 hover:bg-slate-700/40 rounded-lg transition">
+                <ChevronRight className="w-5 h-5 text-blue-400" />
+              </button>
+            </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Resumen */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-gray-600 text-sm font-semibold uppercase mb-2">Total Ingresos</h3>
-            <p className="text-3xl font-bold text-green-600">
-              {formatearMoneda(totalIngresos)}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-gray-600 text-sm font-semibold uppercase mb-2">Total Egresos</h3>
-            <p className="text-3xl font-bold text-red-600">{formatearMoneda(totalEgresos)}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-gray-600 text-sm font-semibold uppercase mb-2">Balance</h3>
-            <p
-              className={`text-3xl font-bold ${
-                totalIngresos - totalEgresos >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}
-            >
-              {formatearMoneda(totalIngresos - totalEgresos)}
-            </p>
-          </div>
-        </div>
+        {loading ? (
+          <LoadingState />
+        ) : reporte ? (
+          <>
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {/* Ingresos Card */}
+              <Card variant="premium" className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-emerald-500/20 rounded-xl">
+                    <TrendingUp className="w-6 h-6 text-emerald-400" />
+                  </div>
+                  <Badge variant="income">Ingresos</Badge>
+                </div>
+                <h2 className="text-4xl font-bold text-emerald-400 mb-1">{formatearMoneda(reporte.totalIngresos)}</h2>
+                <p className="text-sm text-slate-400">Total de ingresos</p>
+              </Card>
 
-        {/* Tabla de ingresos */}
-        <div className="bg-white rounded-lg shadow-lg mb-8 overflow-hidden">
-          <div className="bg-green-100 px-6 py-4">
-            <h3 className="text-xl font-bold text-green-800">Ingresos</h3>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left">Mes</th>
-                  <th className="px-6 py-3 text-left">Concepto</th>
-                  <th className="px-6 py-3 text-left">Monto</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ingresos.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
-                      No hay ingresos
-                    </td>
-                  </tr>
-                ) : (
-                  ingresos.map((ingreso, idx) => (
-                    <tr key={idx} className="border-t hover:bg-gray-50">
-                      <td className="px-6 py-4">{getNombreMes(ingreso.mes)}</td>
-                      <td className="px-6 py-4">{ingreso.conceptos_ingresos.nombre}</td>
-                      <td className="px-6 py-4 font-semibold text-green-600">
-                        {formatearMoneda(ingreso.monto)}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              {/* Egresos Card */}
+              <Card variant="premium" className="bg-gradient-to-br from-red-500/10 to-red-600/5">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-red-500/20 rounded-xl">
+                    <TrendingDown className="w-6 h-6 text-red-400" />
+                  </div>
+                  <Badge variant="expense">Egresos</Badge>
+                </div>
+                <h2 className="text-4xl font-bold text-red-400 mb-1">{formatearMoneda(reporte.totalEgresos)}</h2>
+                <p className="text-sm text-slate-400">Total de egresos</p>
+              </Card>
 
-        {/* Tabla de egresos */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="bg-red-100 px-6 py-4">
-            <h3 className="text-xl font-bold text-red-800">Egresos</h3>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left">Mes</th>
-                  <th className="px-6 py-3 text-left">Concepto</th>
-                  <th className="px-6 py-3 text-left">Monto</th>
-                </tr>
-              </thead>
-              <tbody>
-                {egresos.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
-                      No hay egresos
-                    </td>
-                  </tr>
-                ) : (
-                  egresos.map((egreso, idx) => (
-                    <tr key={idx} className="border-t hover:bg-gray-50">
-                      <td className="px-6 py-4">{getNombreMes(egreso.mes)}</td>
-                      <td className="px-6 py-4">{egreso.conceptos_egresos.nombre}</td>
-                      <td className="px-6 py-4 font-semibold text-red-600">
-                        {formatearMoneda(egreso.monto)}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              {/* Balance Card */}
+              <Card
+                variant="premium"
+                className={`bg-gradient-to-br ${
+                  reporte.balance >= 0
+                    ? 'from-cyan-500/10 to-cyan-600/5'
+                    : 'from-amber-500/10 to-amber-600/5'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div
+                    className={`p-3 rounded-xl ${
+                      reporte.balance >= 0
+                        ? 'bg-cyan-500/20'
+                        : 'bg-amber-500/20'
+                    }`}
+                  >
+                    <Target
+                      className={`w-6 h-6 ${
+                        reporte.balance >= 0
+                          ? 'text-cyan-400'
+                          : 'text-amber-400'
+                      }`}
+                    />
+                  </div>
+                  <Badge variant={reporte.balance >= 0 ? 'balance' : 'neutral'}>
+                    {reporte.balance >= 0 ? 'Positivo' : 'Negativo'}
+                  </Badge>
+                </div>
+                <h2
+                  className={`text-4xl font-bold mb-1 ${
+                    reporte.balance >= 0
+                      ? 'text-cyan-400'
+                      : 'text-amber-400'
+                  }`}
+                >
+                  {formatearMoneda(reporte.balance)}
+                </h2>
+                <p className="text-sm text-slate-400">Balance</p>
+              </Card>
+            </div>
+
+            {/* Top Conceptos */}
+            <Card variant="premium">
+              <h3 className="text-2xl font-bold text-slate-100 mb-6">Top Categorías</h3>
+
+              {reporte.conceptosMasAltos.length === 0 ? (
+                <p className="text-slate-400 text-center py-8">Sin movimientos registrados</p>
+              ) : (
+                <div className="space-y-4">
+                  {reporte.conceptosMasAltos.map((concepto, idx) => (
+                    <div key={idx} className="p-4 bg-slate-800/30 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold text-slate-100">{concepto.concepto}</h4>
+                        <span className="text-sm font-bold text-cyan-400">{concepto.porcentaje.toFixed(1)}%</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 h-2 bg-slate-700/50 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-cyan-500 to-blue-500"
+                            style={{ width: `${concepto.porcentaje}%` }}
+                          />
+                        </div>
+                        <span className="text-right min-w-fit text-slate-300 font-semibold">
+                          {formatearMoneda(concepto.monto)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </>
+        ) : null}
       </div>
     </div>
   );

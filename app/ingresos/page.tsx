@@ -2,225 +2,244 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { getIngresos, getConceptosIngresos, crearIngreso, eliminarIngreso } from '@/lib/supabase';
-import { formatearMoneda, getNombreMes, obtenerAñoActual, obtenerMesActual } from '@/lib/utils';
-import type { ConceptoIngreso } from '@/lib/types';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { FormInput, FormTextarea } from '@/components/ui/FormInput';
+import { Table } from '@/components/ui/Table';
+import { Badge } from '@/components/ui/Badge';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { formatearMoneda, obtenerAñoActual } from '@/lib/utils';
+import type { Transaccion, ResumenConcepto } from '@/lib/types';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
-export default function IngressosPage() {
+export default function IngresosPage() {
   const { usuario, loading: authLoading } = useAuth();
-  const [ingresos, setIngresos] = useState<any[]>([]);
-  const [conceptos, setConceptos] = useState<ConceptoIngreso[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [mes, setMes] = useState(obtenerMesActual());
   const [año, setAño] = useState(obtenerAñoActual());
-  const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState('');
+  const [transacciones, setTransacciones] = useState<Transaccion[]>([]);
+  const [resumen, setResumen] = useState<ResumenConcepto[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [conceptos, setConceptos] = useState<string[]>([]);
+  const [newConcepto, setNewConcepto] = useState('');
 
   const [formData, setFormData] = useState({
-    concepto_id: '',
+    concepto: '',
     monto: '',
+    fecha: new Date().toISOString().split('T')[0],
     descripcion: '',
   });
 
   useEffect(() => {
     if (!authLoading && usuario) {
       cargarDatos();
-    } else if (!authLoading && !usuario) {
-      setLoading(false);
+      cargarConceptos();
     }
-  }, [mes, año, usuario, authLoading]);
+  }, [año, usuario, authLoading]);
 
   async function cargarDatos() {
-    if (!usuario) return;
+    setLoading(true);
     try {
-      const [ing, conc] = await Promise.all([
-        getIngresos(usuario.id, mes, año),
-        getConceptosIngresos(usuario.id),
-      ]);
-      setIngresos(ing);
-      setConceptos(conc);
+      const response = await fetch(`/api/transacciones?usuario=${usuario?.id}&año=${año}&tipo=ingreso`);
+      if (!response.ok) throw new Error('Error al cargar datos');
+      const data = await response.json();
+      setTransacciones(data.data || []);
+
+      const resResponse = await fetch(`/api/resumen?usuario=${usuario?.id}&año=${año}`);
+      if (!resResponse.ok) throw new Error('Error al cargar resumen');
+      const resData = await resResponse.json();
+      setResumen(resData.filter((r: any) => r.ingresos > 0) || []);
     } catch (error) {
-      console.error('Error al cargar datos:', error);
+      console.error('Error:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function cargarConceptos() {
+    try {
+      const response = await fetch(`/api/conceptos?usuario=${usuario?.id}&tipo=ingreso`);
+      if (!response.ok) throw new Error('Error al cargar conceptos');
+      const data = await response.json();
+      setConceptos(data.data || []);
+    } catch (error) {
+      console.error('Error:', error);
     }
   }
 
   async function handleCrearIngreso(e: React.FormEvent) {
     e.preventDefault();
-    setFormError('');
+    if (!usuario || !formData.concepto || !formData.monto) return;
 
-    if (!formData.concepto_id) {
-      setFormError('Selecciona un concepto');
-      return;
-    }
-    if (!formData.monto) {
-      setFormError('Ingresa un monto');
-      return;
-    }
-    if (!usuario) {
-      setFormError('Usuario no autenticado');
-      return;
-    }
-
-    setFormLoading(true);
     try {
-      await crearIngreso(
-        usuario.id,
-        mes,
-        año,
-        parseInt(formData.concepto_id),
-        parseFloat(formData.monto),
-        formData.descripcion
-      );
-      setFormData({ concepto_id: '', monto: '', descripcion: '' });
-      setFormError('');
-      await cargarDatos();
-    } catch (error: any) {
-      const errorMsg = error?.message || 'Error al crear ingreso';
-      setFormError(errorMsg);
-      console.error('Error al crear ingreso:', error);
-    } finally {
-      setFormLoading(false);
+      const response = await fetch('/api/transacciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuario: usuario.id,
+          tipo: 'ingreso',
+          fecha: formData.fecha,
+          concepto: formData.concepto,
+          monto: parseFloat(formData.monto),
+          año,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Error al crear ingreso');
+      setFormData({ concepto: '', monto: '', fecha: new Date().toISOString().split('T')[0], descripcion: '' });
+      setShowForm(false);
+      cargarDatos();
+    } catch (error) {
+      console.error('Error:', error);
     }
   }
 
-  async function handleEliminar(id: number) {
-    if (confirm('¿Eliminar este ingreso?')) {
-      try {
-        await eliminarIngreso(id);
-        cargarDatos();
-      } catch (error) {
-        console.error('Error al eliminar:', error);
-      }
+  async function handleCrearConcepto(e: React.FormEvent) {
+    e.preventDefault();
+    if (!usuario || !newConcepto) return;
+
+    try {
+      const response = await fetch('/api/conceptos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuario: usuario.id,
+          tipo: 'ingreso',
+          concepto: newConcepto,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Error al crear concepto');
+      setNewConcepto('');
+      cargarConceptos();
+    } catch (error) {
+      console.error('Error:', error);
     }
   }
 
-  const totalMes = ingresos.reduce((sum, i) => sum + parseFloat(i.monto), 0);
+  const totalIngresos = resumen.reduce((sum, r) => sum + r.ingresos, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">Gestión de Ingresos</h1>
-
-        {/* Selector de mes/año */}
-        <div className="mb-8 flex gap-4">
-          <select
-            value={mes}
-            onChange={(e) => setMes(parseInt(e.target.value))}
-            className="px-4 py-2 border rounded-lg"
-          >
-            {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-              <option key={m} value={m}>{getNombreMes(m)}</option>
-            ))}
-          </select>
-          <select
-            value={año}
-            onChange={(e) => setAño(parseInt(e.target.value))}
-            className="px-4 py-2 border rounded-lg"
-          >
-            {Array.from({ length: 5 }, (_, i) => año - 2 + i).map(a => (
-              <option key={a} value={a}>{a}</option>
-            ))}
-          </select>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="border-b border-slate-700/30 pb-8 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              💵 Ingresos
+            </h1>
+            <Button variant="success" size="md" onClick={() => setShowForm(!showForm)}>
+              <Plus className="w-4 h-4 mr-2 inline" /> Nuevo Ingreso
+            </Button>
+          </div>
+          <p className="text-slate-400">Gestiona tus ingresos y categorías</p>
         </div>
 
-        {/* Formulario */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Registrar Ingreso</h2>
-          {formError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-              {formError}
+        {/* Year Selector */}
+        <Card variant="premium" className="mb-8">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-300 font-semibold uppercase">Período</span>
+            <div className="flex items-center gap-4">
+              <button onClick={() => setAño(año - 1)} className="p-2 hover:bg-slate-700/40 rounded-lg transition">
+                <ChevronLeft className="w-5 h-5 text-blue-400" />
+              </button>
+              <span className="text-4xl font-bold w-20 text-center text-cyan-400">{año}</span>
+              <button onClick={() => setAño(año + 1)} className="p-2 hover:bg-slate-700/40 rounded-lg transition">
+                <ChevronRight className="w-5 h-5 text-blue-400" />
+              </button>
             </div>
+          </div>
+        </Card>
+
+        {/* Total Income Card */}
+        <Card variant="premium" className="mb-8 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-emerald-400/70 uppercase text-sm font-bold mb-2">Total Ingresos</p>
+              <h2 className="text-4xl font-bold text-emerald-400">{formatearMoneda(totalIngresos)}</h2>
+            </div>
+            <Badge variant="income">{transacciones.length} operaciones</Badge>
+          </div>
+        </Card>
+
+        {/* Form Section */}
+        {showForm && (
+          <Card variant="default" className="mb-8">
+            <h3 className="text-xl font-bold text-slate-100 mb-6">Nuevo Ingreso</h3>
+            <form onSubmit={handleCrearIngreso} className="space-y-4 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">Concepto</label>
+                  <select
+                    value={formData.concepto}
+                    onChange={(e) => setFormData({ ...formData, concepto: e.target.value })}
+                    className="w-full px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-100 focus:outline-none focus:border-blue-500/50"
+                    required
+                  >
+                    <option value="">Selecciona un concepto</option>
+                    {conceptos.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <FormInput
+                  label="Monto"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={formData.monto}
+                  onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
+                  required
+                />
+              </div>
+              <FormInput
+                label="Fecha"
+                type="date"
+                value={formData.fecha}
+                onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
+                required
+              />
+              <Button type="submit" variant="success" size="lg">
+                Crear Ingreso
+              </Button>
+            </form>
+
+            <h3 className="text-xl font-bold text-slate-100 mb-4 pt-6 border-t border-slate-700/30">Nuevo Concepto</h3>
+            <form onSubmit={handleCrearConcepto} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Nombre del concepto"
+                value={newConcepto}
+                onChange={(e) => setNewConcepto(e.target.value)}
+                className="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-100"
+                required
+              />
+              <Button type="submit" variant="secondary">
+                Agregar
+              </Button>
+            </form>
+          </Card>
+        )}
+
+        {/* Table */}
+        <Card variant="default">
+          <h3 className="text-xl font-bold text-slate-100 mb-6">Transacciones</h3>
+          {loading ? (
+            <LoadingState variant="skeleton" />
+          ) : transacciones.length === 0 ? (
+            <p className="text-slate-400 text-center py-8">No hay ingresos registrados</p>
+          ) : (
+            <Table
+              columns={[
+                { key: 'fecha', label: 'Fecha', align: 'left' },
+                { key: 'concepto', label: 'Concepto', align: 'left' },
+                { key: 'monto', label: 'Monto', align: 'right', render: (v) => formatearMoneda(v) },
+              ]}
+              data={transacciones}
+            />
           )}
-          <form onSubmit={handleCrearIngreso} className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <select
-              value={formData.concepto_id}
-              onChange={(e) => setFormData({ ...formData, concepto_id: e.target.value })}
-              className="px-4 py-2 border rounded-lg"
-              disabled={formLoading}
-            >
-              <option value="">Selecciona concepto</option>
-              {conceptos.map(c => (
-                <option key={c.id} value={c.id}>{c.nombre}</option>
-              ))}
-            </select>
-            <input
-              type="number"
-              placeholder="Monto"
-              value={formData.monto}
-              onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
-              className="px-4 py-2 border rounded-lg"
-              step="0.01"
-              disabled={formLoading}
-            />
-            <input
-              type="text"
-              placeholder="Descripción (opcional)"
-              value={formData.descripcion}
-              onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-              className="px-4 py-2 border rounded-lg"
-              disabled={formLoading}
-            />
-            <button
-              type="submit"
-              disabled={formLoading}
-              className="px-6 py-2 bg-[#4a6fa5] text-white rounded-lg hover:bg-[#3d5a7f] disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {formLoading ? 'Registrando...' : 'Registrar'}
-            </button>
-          </form>
-        </div>
-
-        {/* Resumen */}
-        <div className="bg-green-50 rounded-lg shadow p-4 mb-8 border-l-4 border-green-600">
-          <p className="text-lg font-semibold text-gray-800">
-            Total {getNombreMes(mes)}: <span className="text-2xl text-green-600">{formatearMoneda(totalMes)}</span>
-          </p>
-        </div>
-
-        {/* Tabla de ingresos */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="px-6 py-3 text-left font-semibold">Concepto</th>
-                <th className="px-6 py-3 text-left font-semibold">Monto</th>
-                <th className="px-6 py-3 text-left font-semibold">Descripción</th>
-                <th className="px-6 py-3 text-left font-semibold">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ingresos.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
-                    No hay ingresos registrados
-                  </td>
-                </tr>
-              ) : (
-                ingresos.map(ingreso => (
-                  <tr key={ingreso.id} className="border-t hover:bg-gray-50">
-                    <td className="px-6 py-4">{ingreso.conceptos_ingresos.nombre}</td>
-                    <td className="px-6 py-4 font-semibold text-green-600">
-                      {formatearMoneda(ingreso.monto)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {ingreso.descripcion || '-'}
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => handleEliminar(ingreso.id)}
-                        className="text-red-600 hover:text-red-800 font-semibold"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        </Card>
       </div>
     </div>
   );

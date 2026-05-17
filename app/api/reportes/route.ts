@@ -1,60 +1,55 @@
-import { getResumenPorConcepto } from '@/lib/supabase';
+import { getResumenPorConcepto } from '@/lib/google-sheets';
 import { NextRequest, NextResponse } from 'next/server';
-import type { ReporteAnalytics, ApiResponse } from '@/lib/types';
+import type { ReporteAnalytics, ApiResponse, ApiError } from '@/lib/types';
 
+// GET: Obtener reportes y analytics
 export async function GET(request: NextRequest) {
   try {
     const usuario = request.nextUrl.searchParams.get('usuario');
     const año = request.nextUrl.searchParams.get('año');
 
-    if (!usuario) {
-      return NextResponse.json(
-        { error: 'usuario es requerido' },
+    if (!usuario || !año) {
+      return NextResponse.json<ApiError>(
+        { error: 'usuario y año son requeridos' },
         { status: 400 }
       );
     }
 
-    const resumenPorConcepto = await getResumenPorConcepto(
-      parseInt(usuario),
-      año ? parseInt(año) : undefined
-    );
+    const resumen = await getResumenPorConcepto(usuario, parseInt(año));
 
-    const totalIngresos = resumenPorConcepto.reduce((sum, c: any) => sum + c.ingresos, 0);
-    const totalEgresos = resumenPorConcepto.reduce((sum, c: any) => sum + c.egresos, 0);
+    const totalIngresos = resumen.reduce((sum, r) => sum + r.ingresos, 0);
+    const totalEgresos = resumen.reduce((sum, r) => sum + r.egresos, 0);
     const balance = totalIngresos - totalEgresos;
 
-    // Combinar ingresos y egresos para obtener el monto total por concepto
-    const conceptosMontosMap = new Map<string, number>();
-    resumenPorConcepto.forEach((c: any) => {
-      const monto = c.ingresos + c.egresos;
-      conceptosMontosMap.set(c.concepto, monto);
-    });
+    // Obtener top conceptos
+    const conceptosMasAltos = resumen
+      .filter((r) => r.ingresos > 0 || r.egresos > 0)
+      .map((r) => ({
+        concepto: r.concepto,
+        monto: r.ingresos > 0 ? r.ingresos : r.egresos,
+        porcentaje:
+          r.ingresos > 0
+            ? (r.ingresos / totalIngresos) * 100
+            : (r.egresos / totalEgresos) * 100,
+      }))
+      .sort((a, b) => b.monto - a.monto)
+      .slice(0, 5);
 
-    // Obtener top 5 conceptos por monto
-    const conceptosMasAltos = Array.from(conceptosMontosMap.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([concepto, monto]) => ({
-        concepto,
-        monto,
-        porcentaje: ((monto / (totalIngresos + totalEgresos)) * 100) || 0,
-      }));
-
-    const reporte: ReporteAnalytics = {
+    const analytics: ReporteAnalytics = {
       totalIngresos,
       totalEgresos,
       balance,
       conceptosMasAltos,
-      evolucion: [], // TODO: implementar evolución mensual
+      evolucion: [], // Se puede implementar si se necesita evolución mensual
     };
 
     return NextResponse.json<ApiResponse<ReporteAnalytics>>({
       success: true,
-      data: reporte,
+      data: analytics,
     });
   } catch (error) {
     console.error('Error en GET /api/reportes:', error);
-    return NextResponse.json(
+    return NextResponse.json<ApiError>(
       { error: 'Error al obtener reportes', details: String(error) },
       { status: 500 }
     );
