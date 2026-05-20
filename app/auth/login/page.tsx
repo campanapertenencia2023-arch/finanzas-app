@@ -31,19 +31,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-white to-slate-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Card variant="premium">
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
+            <h1 className="text-5xl font-bold text-slate-900 mb-2 font-montserrat">
               💰 Finanzas
             </h1>
-            <p className="text-slate-400">Inicia sesión en tu cuenta</p>
+            <p className="text-slate-600">Inicia sesión en tu cuenta</p>
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 mb-6">
-              <p className="text-red-400 text-sm font-semibold">⚠️ {error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-700 text-sm font-semibold">⚠️ {error}</p>
             </div>
           )}
 
@@ -77,8 +77,8 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-slate-700/30 text-center text-slate-400 text-sm">
-            <p>Usuarios de prueba: <span className="text-cyan-400 font-semibold">julian</span> o <span className="text-cyan-400 font-semibold">paola</span></p>
+          <div className="mt-6 pt-6 border-t border-slate-200 text-center text-slate-600 text-sm">
+            <p>Usuarios de prueba: <span className="text-blue-600 font-semibold">julian</span> o <span className="text-blue-600 font-semibold">paola</span></p>
           </div>
         </Card>
       </div>

@@ -36,25 +36,25 @@ export default function ReportesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 p-8">
+    <div className="min-h-screen from-white to-slate-50 text-slate-900 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="border-b border-slate-700/30 pb-8 mb-8">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+        <div className="border-b border-slate-200 pb-8 mb-8">
+          <h1 className="text-5xl font-bold font-montserrat bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
             📊 Reportes
           </h1>
-          <p className="text-slate-400">Análisis y estadísticas de tus finanzas</p>
+          <p className="text-slate-600">Análisis y estadísticas de tus finanzas</p>
         </div>
 
         {/* Year Selector */}
         <Card variant="premium" className="mb-8">
           <div className="flex items-center justify-between">
-            <span className="text-slate-300 font-semibold uppercase">Período</span>
+            <span className="text-slate-700 font-semibold uppercase">Período</span>
             <div className="flex items-center gap-4">
               <button onClick={() => setAño(año - 1)} className="p-2 hover:bg-slate-700/40 rounded-lg transition">
                 <ChevronLeft className="w-5 h-5 text-blue-400" />
               </button>
-              <span className="text-4xl font-bold w-20 text-center text-cyan-400">{año}</span>
+              <span className="text-4xl font-bold font-montserrat w-20 text-center text-cyan-600">{año}</span>
               <button onClick={() => setAño(año + 1)} className="p-2 hover:bg-slate-700/40 rounded-lg transition">
                 <ChevronRight className="w-5 h-5 text-blue-400" />
               </button>
@@ -72,12 +72,12 @@ export default function ReportesPage() {
               <Card variant="premium" className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 bg-emerald-500/20 rounded-xl">
-                    <TrendingUp className="w-6 h-6 text-emerald-400" />
+                    <TrendingUp className="w-6 h-6 text-emerald-600" />
                   </div>
                   <Badge variant="income">Ingresos</Badge>
                 </div>
-                <h2 className="text-4xl font-bold text-emerald-400 mb-1">{formatearMoneda(reporte.totalIngresos)}</h2>
-                <p className="text-sm text-slate-400">Total de ingresos</p>
+                <h2 className="text-4xl font-bold font-montserrat text-emerald-600 mb-1">{formatearMoneda(reporte.totalIngresos)}</h2>
+                <p className="text-sm text-slate-600">Total de ingresos</p>
               </Card>
 
               {/* Egresos Card */}
@@ -88,8 +88,8 @@ export default function ReportesPage() {
                   </div>
                   <Badge variant="expense">Egresos</Badge>
                 </div>
-                <h2 className="text-4xl font-bold text-red-400 mb-1">{formatearMoneda(reporte.totalEgresos)}</h2>
-                <p className="text-sm text-slate-400">Total de egresos</p>
+                <h2 className="text-4xl font-bold font-montserrat text-red-400 mb-1">{formatearMoneda(reporte.totalEgresos)}</h2>
+                <p className="text-sm text-slate-600">Total de egresos</p>
               </Card>
 
               {/* Balance Card */}
@@ -112,7 +112,7 @@ export default function ReportesPage() {
                     <Target
                       className={`w-6 h-6 ${
                         reporte.balance >= 0
-                          ? 'text-cyan-400'
+                          ? 'text-cyan-600'
                           : 'text-amber-400'
                       }`}
                     />
@@ -122,31 +122,31 @@ export default function ReportesPage() {
                   </Badge>
                 </div>
                 <h2
-                  className={`text-4xl font-bold mb-1 ${
+                  className={`text-4xl font-bold font-montserrat mb-1 ${
                     reporte.balance >= 0
-                      ? 'text-cyan-400'
+                      ? 'text-cyan-600'
                       : 'text-amber-400'
                   }`}
                 >
                   {formatearMoneda(reporte.balance)}
                 </h2>
-                <p className="text-sm text-slate-400">Balance</p>
+                <p className="text-sm text-slate-600">Balance</p>
               </Card>
             </div>
 
             {/* Top Conceptos */}
             <Card variant="premium">
-              <h3 className="text-2xl font-bold text-slate-100 mb-6">Top Categorías</h3>
+              <h3 className="text-2xl font-bold font-montserrat text-slate-900 mb-6">Top Categorías</h3>
 
               {reporte.conceptosMasAltos.length === 0 ? (
-                <p className="text-slate-400 text-center py-8">Sin movimientos registrados</p>
+                <p className="text-slate-600 text-center py-8">Sin movimientos registrados</p>
               ) : (
                 <div className="space-y-4">
                   {reporte.conceptosMasAltos.map((concepto, idx) => (
                     <div key={idx} className="p-4 bg-slate-800/30 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-slate-100">{concepto.concepto}</h4>
-                        <span className="text-sm font-bold text-cyan-400">{concepto.porcentaje.toFixed(1)}%</span>
+                        <h4 className="font-semibold text-slate-900">{concepto.concepto}</h4>
+                        <span className="text-sm font-bold text-cyan-600">{concepto.porcentaje.toFixed(1)}%</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="flex-1 h-2 bg-slate-700/50 rounded-full overflow-hidden">
@@ -155,7 +155,7 @@ export default function ReportesPage() {
                             style={{ width: `${concepto.porcentaje}%` }}
                           />
                         </div>
-                        <span className="text-right min-w-fit text-slate-300 font-semibold">
+                        <span className="text-right min-w-fit text-slate-700 font-semibold">
                           {formatearMoneda(concepto.monto)}
                         </span>
                       </div>

@@ -30,15 +30,15 @@ export class ErrorBoundary extends React.Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-8">
-            <div className="bg-red-500/10 border border-red-500/50 rounded-2xl p-8 max-w-md text-center">
-              <h1 className="text-2xl font-bold text-red-400 mb-2">⚠️ Error</h1>
-              <p className="text-slate-300 mb-4">
+          <div className="min-h-screen bg-gradient-to-br from-white to-slate-50 flex items-center justify-center p-8">
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-8 max-w-md text-center shadow-md">
+              <h1 className="text-2xl font-bold text-red-700 mb-2 font-montserrat">Error</h1>
+              <p className="text-red-600 mb-4">
                 {this.state.error?.message || 'Algo salió mal. Por favor intenta recargar la página.'}
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors"
+                className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-all shadow-sm hover:shadow-md"
               >
                 Recargar Página
               </button>

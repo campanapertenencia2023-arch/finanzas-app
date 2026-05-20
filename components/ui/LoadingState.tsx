@@ -11,10 +11,10 @@ export function LoadingState({ variant = 'pulse', message = 'Cargando...', rows 
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <div className="relative w-12 h-12 mb-4">
-          <div className="absolute inset-0 rounded-full border-4 border-slate-700/30"></div>
+          <div className="absolute inset-0 rounded-full border-4 border-slate-200"></div>
           <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 animate-spin"></div>
         </div>
-        <p className="text-slate-400 text-sm">{message}</p>
+        <p className="text-slate-600 text-sm">{message}</p>
       </div>
     );
   }
@@ -25,7 +25,7 @@ export function LoadingState({ variant = 'pulse', message = 'Cargando...', rows 
         {Array(rows)
           .fill(0)
           .map((_, i) => (
-            <div key={i} className="h-12 bg-slate-800/40 rounded-lg animate-pulse"></div>
+            <div key={i} className="h-12 bg-slate-100 rounded-lg animate-pulse"></div>
           ))}
       </div>
     );
@@ -40,7 +40,7 @@ export function LoadingState({ variant = 'pulse', message = 'Cargando...', rows 
           <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
         </div>
       </div>
-      <p className="text-slate-400 text-sm mt-4">{message}</p>
+      <p className="text-slate-600 text-sm mt-4">{message}</p>
     </div>
   );
 }

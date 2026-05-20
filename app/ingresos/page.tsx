@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { FormInput, FormTextarea } from '@/components/ui/FormInput';
+import { FormInput } from '@/components/ui/FormInput';
 import { Table } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -26,7 +26,6 @@ export default function IngresosPage() {
     concepto: '',
     monto: '',
     fecha: new Date().toISOString().split('T')[0],
-    descripcion: '',
   });
 
   useEffect(() => {
@@ -85,7 +84,7 @@ export default function IngresosPage() {
       });
 
       if (!response.ok) throw new Error('Error al crear ingreso');
-      setFormData({ concepto: '', monto: '', fecha: new Date().toISOString().split('T')[0], descripcion: '' });
+      setFormData({ concepto: '', monto: '', fecha: new Date().toISOString().split('T')[0] });
       setShowForm(false);
       cargarDatos();
     } catch (error) {
@@ -119,43 +118,41 @@ export default function IngresosPage() {
   const totalIngresos = resumen.reduce((sum, r) => sum + r.ingresos, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-white to-slate-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="border-b border-slate-700/30 pb-8 mb-8">
+        <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              💵 Ingresos
-            </h1>
+            <h1 className="text-5xl font-bold text-slate-900 font-montserrat">Ingresos</h1>
             <Button variant="success" size="md" onClick={() => setShowForm(!showForm)}>
               <Plus className="w-4 h-4 mr-2 inline" /> Nuevo Ingreso
             </Button>
           </div>
-          <p className="text-slate-400">Gestiona tus ingresos y categorías</p>
+          <p className="text-slate-600">Gestiona tus ingresos y categorías</p>
         </div>
 
         {/* Year Selector */}
         <Card variant="premium" className="mb-8">
           <div className="flex items-center justify-between">
-            <span className="text-slate-300 font-semibold uppercase">Período</span>
+            <span className="text-slate-700 font-semibold uppercase text-sm">Período</span>
             <div className="flex items-center gap-4">
-              <button onClick={() => setAño(año - 1)} className="p-2 hover:bg-slate-700/40 rounded-lg transition">
-                <ChevronLeft className="w-5 h-5 text-blue-400" />
+              <button onClick={() => setAño(año - 1)} className="p-2 hover:bg-slate-100 rounded-lg transition">
+                <ChevronLeft className="w-5 h-5 text-slate-700" />
               </button>
-              <span className="text-4xl font-bold w-20 text-center text-cyan-400">{año}</span>
-              <button onClick={() => setAño(año + 1)} className="p-2 hover:bg-slate-700/40 rounded-lg transition">
-                <ChevronRight className="w-5 h-5 text-blue-400" />
+              <span className="text-4xl font-bold w-20 text-center text-blue-600 font-montserrat">{año}</span>
+              <button onClick={() => setAño(año + 1)} className="p-2 hover:bg-slate-100 rounded-lg transition">
+                <ChevronRight className="w-5 h-5 text-slate-700" />
               </button>
             </div>
           </div>
         </Card>
 
         {/* Total Income Card */}
-        <Card variant="premium" className="mb-8 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5">
+        <Card variant="premium" className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-emerald-400/70 uppercase text-sm font-bold mb-2">Total Ingresos</p>
-              <h2 className="text-4xl font-bold text-emerald-400">{formatearMoneda(totalIngresos)}</h2>
+              <p className="text-emerald-600 uppercase text-sm font-bold mb-2 font-montserrat">Total Ingresos</p>
+              <h2 className="text-4xl font-bold text-emerald-600 font-montserrat">{formatearMoneda(totalIngresos)}</h2>
             </div>
             <Badge variant="income">{transacciones.length} operaciones</Badge>
           </div>
@@ -164,15 +161,15 @@ export default function IngresosPage() {
         {/* Form Section */}
         {showForm && (
           <Card variant="default" className="mb-8">
-            <h3 className="text-xl font-bold text-slate-100 mb-6">Nuevo Ingreso</h3>
+            <h3 className="text-2xl font-bold text-slate-900 mb-6 font-montserrat">Nuevo Ingreso</h3>
             <form onSubmit={handleCrearIngreso} className="space-y-4 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300 mb-2">Concepto</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Concepto</label>
                   <select
                     value={formData.concepto}
                     onChange={(e) => setFormData({ ...formData, concepto: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-100 focus:outline-none focus:border-blue-500/50"
+                    className="w-full px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 shadow-sm"
                     required
                   >
                     <option value="">Selecciona un concepto</option>
@@ -205,14 +202,14 @@ export default function IngresosPage() {
               </Button>
             </form>
 
-            <h3 className="text-xl font-bold text-slate-100 mb-4 pt-6 border-t border-slate-700/30">Nuevo Concepto</h3>
+            <h3 className="text-2xl font-bold text-slate-900 mb-4 pt-6 border-t border-slate-200 font-montserrat">Nuevo Concepto</h3>
             <form onSubmit={handleCrearConcepto} className="flex gap-2">
               <input
                 type="text"
                 placeholder="Nombre del concepto"
                 value={newConcepto}
                 onChange={(e) => setNewConcepto(e.target.value)}
-                className="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-100"
+                className="flex-1 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 shadow-sm"
                 required
               />
               <Button type="submit" variant="secondary">
@@ -224,11 +221,11 @@ export default function IngresosPage() {
 
         {/* Table */}
         <Card variant="default">
-          <h3 className="text-xl font-bold text-slate-100 mb-6">Transacciones</h3>
+          <h3 className="text-2xl font-bold text-slate-900 mb-6 font-montserrat">Transacciones</h3>
           {loading ? (
             <LoadingState variant="skeleton" />
           ) : transacciones.length === 0 ? (
-            <p className="text-slate-400 text-center py-8">No hay ingresos registrados</p>
+            <p className="text-slate-500 text-center py-8">No hay ingresos registrados</p>
           ) : (
             <Table
               columns={[

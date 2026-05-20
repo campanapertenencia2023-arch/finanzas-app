@@ -1,4 +1,4 @@
-// Unified Theme Configuration
+// Unified Theme Configuration - LIGHT MODE
 export const theme = {
   colors: {
     // Primary
@@ -8,45 +8,45 @@ export const theme = {
 
     // Income (Ingresos)
     income: '#10b981', // emerald-600
-    incomeLight: '#a7f3d0', // emerald-100
-    incomeDark: '#047857', // emerald-800
+    incomeLight: '#d1fae5', // emerald-100
+    incomeDark: '#059669', // emerald-700
 
     // Expense (Egresos)
-    expense: '#dc2626', // red-600
-    expenseLight: '#fecaca', // red-200
-    expenseDark: '#991b1b', // red-900
+    expense: '#ef4444', // red-500
+    expenseLight: '#fee2e2', // red-100
+    expenseDark: '#dc2626', // red-600
 
     // Balance (positive/negative)
     positive: '#06b6d4', // cyan-600
-    negative: '#f59e0b', // amber-500
+    negative: '#f97316', // orange-500
 
-    // Backgrounds
+    // Backgrounds (Light Mode)
     bg: {
-      dark: '#0f172a', // slate-950
-      darker: '#0f172a', // slate-950
-      card: 'rgba(71, 85, 105, 0.15)', // slate-700/15
-      cardHover: 'rgba(71, 85, 105, 0.25)', // slate-700/25
+      light: '#ffffff', // white
+      lighter: '#f5f7fa', // slate-100 light
+      card: '#ffffff',
+      cardHover: '#f9fafb', // slate-50
     },
 
-    // Text
+    // Text (Light Mode)
     text: {
-      primary: '#f1f5f9', // slate-100
-      secondary: '#cbd5e1', // slate-300
-      muted: '#94a3b8', // slate-400
-      disabled: '#64748b', // slate-500
+      primary: '#1f2937', // slate-800
+      secondary: '#4b5563', // slate-600
+      muted: '#6b7280', // slate-500
+      disabled: '#9ca3af', // slate-400
     },
 
-    // Borders
+    // Borders (Light Mode)
     border: {
-      default: '#475569', // slate-600
-      light: '#334155', // slate-700
-      lighter: '#1e293b', // slate-800
+      default: '#e5e7eb', // slate-200
+      light: '#f3f4f6', // slate-100
+      lighter: '#e8ebf0', // slate-100 custom
     },
 
     // Status
     error: '#ef4444', // red-500
-    warning: '#eab308', // yellow-400
-    success: '#22c55e', // green-500
+    warning: '#f59e0b', // amber-500
+    success: '#10b981', // green-600
     info: '#3b82f6', // blue-500
   },
 
@@ -74,47 +74,47 @@ export const theme = {
   },
 };
 
-// Tailwind Class Helpers
+// Tailwind Class Helpers - LIGHT MODE
 export const styles = {
   card: {
-    base: 'rounded-2xl backdrop-blur-xl transition-all duration-300',
-    default: 'bg-slate-800/30 border border-slate-700/50',
-    premium: 'bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 shadow-xl hover:shadow-2xl',
-    elevated: 'bg-gradient-to-b from-slate-700/40 to-slate-800/40 border border-slate-600/50 shadow-lg',
+    base: 'rounded-2xl transition-all duration-300',
+    default: 'bg-white border border-slate-200 shadow-sm hover:shadow-md',
+    premium: 'bg-white border border-slate-200 shadow-md hover:shadow-lg',
+    elevated: 'bg-white border border-slate-200 shadow-lg hover:shadow-xl',
   },
 
   button: {
-    base: 'font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
-    primary: 'bg-blue-500 hover:bg-blue-600 text-white active:scale-95',
-    secondary: 'bg-slate-700 hover:bg-slate-600 text-slate-100 active:scale-95',
-    danger: 'bg-red-600 hover:bg-red-700 text-white active:scale-95',
-    success: 'bg-emerald-600 hover:bg-emerald-700 text-white active:scale-95',
+    base: 'font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95',
+    primary: 'bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md',
+    secondary: 'bg-slate-100 hover:bg-slate-200 text-slate-800 shadow-sm hover:shadow-md',
+    danger: 'bg-red-500 hover:bg-red-600 text-white shadow-sm hover:shadow-md',
+    success: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:shadow-md',
   },
 
   input: {
-    base: 'px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-100 placeholder-slate-500',
-    focus: 'focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20',
-    error: 'border-red-500/50',
+    base: 'px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder-slate-400 shadow-sm',
+    focus: 'focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200',
+    error: 'border-red-500 focus:ring-red-200',
   },
 
   table: {
-    header: 'bg-gradient-to-r from-slate-800/50 to-slate-900/50 border-b border-slate-700/50',
-    row: 'border-b border-slate-700/30 hover:bg-slate-700/20',
+    header: 'bg-slate-50 border-b border-slate-200 font-semibold text-slate-700',
+    row: 'border-b border-slate-100 hover:bg-slate-50 transition-colors',
   },
 
   text: {
-    h1: 'text-6xl font-bold',
-    h2: 'text-4xl font-bold',
-    h3: 'text-2xl font-bold',
-    h4: 'text-xl font-bold',
-    body: 'text-base',
-    small: 'text-sm',
-    xs: 'text-xs',
+    h1: 'text-6xl font-bold text-slate-900',
+    h2: 'text-4xl font-bold text-slate-900',
+    h3: 'text-2xl font-bold text-slate-900',
+    h4: 'text-xl font-bold text-slate-900',
+    body: 'text-base text-slate-700',
+    small: 'text-sm text-slate-600',
+    xs: 'text-xs text-slate-500',
   },
 
   gradient: {
-    brand: 'from-emerald-400 via-cyan-400 to-blue-500',
-    warm: 'from-amber-400 to-orange-500',
-    cool: 'from-cyan-400 to-blue-500',
+    brand: 'from-blue-500 to-cyan-500',
+    warm: 'from-orange-500 to-red-500',
+    cool: 'from-blue-500 to-cyan-500',
   },
 };

@@ -74,14 +74,14 @@ export default function ConceptosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 p-8">
+    <div className="min-h-screen from-white to-slate-50 text-slate-900 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="border-b border-slate-700/30 pb-8 mb-8">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
+        <div className="border-b border-slate-200 pb-8 mb-8">
+          <h1 className="text-5xl font-bold font-montserrat bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
             🏷️ Conceptos
           </h1>
-          <p className="text-slate-400">Gestiona las categorías de tus transacciones</p>
+          <p className="text-slate-600">Gestiona las categorías de tus transacciones</p>
         </div>
 
         {loading ? (
@@ -92,10 +92,10 @@ export default function ConceptosPage() {
             <Card variant="premium" className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5">
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-2xl font-bold text-emerald-400">Ingresos</h2>
+                  <h2 className="text-2xl font-bold font-montserrat text-emerald-600">Ingresos</h2>
                   <Badge variant="income">{conceptosIngresos.length}</Badge>
                 </div>
-                <p className="text-emerald-400/70 text-sm">Categorías de ingreso</p>
+                <p className="text-emerald-600 text-sm">Categorías de ingreso</p>
               </div>
 
               <form
@@ -103,14 +103,14 @@ export default function ConceptosPage() {
                   e.preventDefault();
                   handleCrearConcepto('ingreso', newConceptoIngreso);
                 }}
-                className="mb-6 pb-6 border-b border-slate-700/30 flex gap-2"
+                className="mb-6 pb-6 border-b border-slate-200 flex gap-2"
               >
                 <input
                   type="text"
                   placeholder="Nuevo concepto"
                   value={newConceptoIngreso}
                   onChange={(e) => setNewConceptoIngreso(e.target.value)}
-                  className="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-100 placeholder-slate-500"
+                  className="flex-1 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder-slate-500"
                   required
                 />
                 <Button type="submit" variant="success" size="md">
@@ -120,10 +120,10 @@ export default function ConceptosPage() {
 
               <div className="space-y-2">
                 {conceptosIngresos.length === 0 ? (
-                  <p className="text-slate-400 text-sm">Sin conceptos aún</p>
+                  <p className="text-slate-600 text-sm">Sin conceptos aún</p>
                 ) : (
                   conceptosIngresos.map((concepto) => (
-                    <div key={concepto} className="px-4 py-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 font-semibold">
+                    <div key={concepto} className="px-4 py-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-600 font-semibold">
                       {concepto}
                     </div>
                   ))
@@ -135,7 +135,7 @@ export default function ConceptosPage() {
             <Card variant="premium" className="bg-gradient-to-br from-red-500/10 to-red-600/5">
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-2xl font-bold text-red-400">Egresos</h2>
+                  <h2 className="text-2xl font-bold font-montserrat text-red-400">Egresos</h2>
                   <Badge variant="expense">{conceptosEgresos.length}</Badge>
                 </div>
                 <p className="text-red-400/70 text-sm">Categorías de egreso</p>
@@ -146,14 +146,14 @@ export default function ConceptosPage() {
                   e.preventDefault();
                   handleCrearConcepto('egreso', newConceptoEgreso);
                 }}
-                className="mb-6 pb-6 border-b border-slate-700/30 flex gap-2"
+                className="mb-6 pb-6 border-b border-slate-200 flex gap-2"
               >
                 <input
                   type="text"
                   placeholder="Nuevo concepto"
                   value={newConceptoEgreso}
                   onChange={(e) => setNewConceptoEgreso(e.target.value)}
-                  className="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-100 placeholder-slate-500"
+                  className="flex-1 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder-slate-500"
                   required
                 />
                 <Button type="submit" variant="danger" size="md">
@@ -163,7 +163,7 @@ export default function ConceptosPage() {
 
               <div className="space-y-2">
                 {conceptosEgresos.length === 0 ? (
-                  <p className="text-slate-400 text-sm">Sin conceptos aún</p>
+                  <p className="text-slate-600 text-sm">Sin conceptos aún</p>
                 ) : (
                   conceptosEgresos.map((concepto) => (
                     <div key={concepto} className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 font-semibold">

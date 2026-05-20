@@ -10,10 +10,10 @@ export function Badge({ children, variant = 'neutral', className = '' }: BadgePr
   const baseStyles = 'inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest';
 
   const variants = {
-    income: 'bg-emerald-500/20 text-emerald-400 border border-emerald-400/30',
-    expense: 'bg-red-500/20 text-red-400 border border-red-400/30',
-    balance: 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30',
-    neutral: 'bg-slate-500/20 text-slate-400 border border-slate-400/30',
+    income: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+    expense: 'bg-red-100 text-red-700 border border-red-200',
+    balance: 'bg-cyan-100 text-cyan-700 border border-cyan-200',
+    neutral: 'bg-slate-100 text-slate-700 border border-slate-200',
   };
 
   return (

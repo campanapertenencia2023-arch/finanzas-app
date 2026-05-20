@@ -7,12 +7,12 @@ interface CardProps {
 }
 
 export function Card({ children, className = '', variant = 'default' }: CardProps) {
-  const baseStyles = 'rounded-2xl backdrop-blur-xl transition-all duration-300';
+  const baseStyles = 'rounded-2xl transition-all duration-300';
 
   const variants = {
-    default: 'bg-slate-800/30 border border-slate-700/50 p-8',
-    premium: 'bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 p-8 shadow-xl hover:shadow-2xl',
-    elevated: 'bg-gradient-to-b from-slate-700/40 to-slate-800/40 border border-slate-600/50 p-6 shadow-lg',
+    default: 'bg-white border border-slate-200 p-8 shadow-sm hover:shadow-md',
+    premium: 'bg-white border border-slate-200 p-8 shadow-md hover:shadow-lg',
+    elevated: 'bg-white border border-slate-200 p-6 shadow-lg hover:shadow-xl',
   };
 
   return (

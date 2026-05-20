@@ -119,30 +119,30 @@ export default function EgresosPage() {
   const totalEgresos = resumen.reduce((sum, r) => sum + r.egresos, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 p-8">
+    <div className="min-h-screen from-white to-slate-50 text-slate-900 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="border-b border-slate-700/30 pb-8 mb-8">
+        <div className="border-b border-slate-200 pb-8 mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
+            <h1 className="text-5xl font-bold font-montserrat bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
               💸 Egresos
             </h1>
             <Button variant="danger" size="md" onClick={() => setShowForm(!showForm)}>
               <Plus className="w-4 h-4 mr-2 inline" /> Nuevo Egreso
             </Button>
           </div>
-          <p className="text-slate-400">Gestiona tus gastos y categorías</p>
+          <p className="text-slate-600">Gestiona tus gastos y categorías</p>
         </div>
 
         {/* Year Selector */}
         <Card variant="premium" className="mb-8">
           <div className="flex items-center justify-between">
-            <span className="text-slate-300 font-semibold uppercase">Período</span>
+            <span className="text-slate-700 font-semibold uppercase">Período</span>
             <div className="flex items-center gap-4">
               <button onClick={() => setAño(año - 1)} className="p-2 hover:bg-slate-700/40 rounded-lg transition">
                 <ChevronLeft className="w-5 h-5 text-red-400" />
               </button>
-              <span className="text-4xl font-bold w-20 text-center text-red-400">{año}</span>
+              <span className="text-4xl font-bold font-montserrat w-20 text-center text-red-400">{año}</span>
               <button onClick={() => setAño(año + 1)} className="p-2 hover:bg-slate-700/40 rounded-lg transition">
                 <ChevronRight className="w-5 h-5 text-red-400" />
               </button>
@@ -155,7 +155,7 @@ export default function EgresosPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-red-400/70 uppercase text-sm font-bold mb-2">Total Egresos</p>
-              <h2 className="text-4xl font-bold text-red-400">{formatearMoneda(totalEgresos)}</h2>
+              <h2 className="text-4xl font-bold font-montserrat text-red-400">{formatearMoneda(totalEgresos)}</h2>
             </div>
             <Badge variant="expense">{transacciones.length} operaciones</Badge>
           </div>
@@ -164,15 +164,15 @@ export default function EgresosPage() {
         {/* Form Section */}
         {showForm && (
           <Card variant="default" className="mb-8">
-            <h3 className="text-xl font-bold text-slate-100 mb-6">Nuevo Egreso</h3>
+            <h3 className="text-xl font-bold font-montserrat text-slate-900 mb-6">Nuevo Egreso</h3>
             <form onSubmit={handleCrearEgreso} className="space-y-4 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300 mb-2">Concepto</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Concepto</label>
                   <select
                     value={formData.concepto}
                     onChange={(e) => setFormData({ ...formData, concepto: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-100 focus:outline-none focus:border-blue-500/50"
+                    className="w-full px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 focus:outline-none focus:border-blue-500/50"
                     required
                   >
                     <option value="">Selecciona un concepto</option>
@@ -205,14 +205,14 @@ export default function EgresosPage() {
               </Button>
             </form>
 
-            <h3 className="text-xl font-bold text-slate-100 mb-4 pt-6 border-t border-slate-700/30">Nuevo Concepto</h3>
+            <h3 className="text-xl font-bold font-montserrat text-slate-900 mb-4 pt-6 border-t border-slate-200">Nuevo Concepto</h3>
             <form onSubmit={handleCrearConcepto} className="flex gap-2">
               <input
                 type="text"
                 placeholder="Nombre del concepto"
                 value={newConcepto}
                 onChange={(e) => setNewConcepto(e.target.value)}
-                className="flex-1 px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-100"
+                className="flex-1 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-900"
                 required
               />
               <Button type="submit" variant="secondary">
@@ -224,11 +224,11 @@ export default function EgresosPage() {
 
         {/* Table */}
         <Card variant="default">
-          <h3 className="text-xl font-bold text-slate-100 mb-6">Transacciones</h3>
+          <h3 className="text-xl font-bold font-montserrat text-slate-900 mb-6">Transacciones</h3>
           {loading ? (
             <LoadingState variant="skeleton" />
           ) : transacciones.length === 0 ? (
-            <p className="text-slate-400 text-center py-8">No hay egresos registrados</p>
+            <p className="text-slate-600 text-center py-8">No hay egresos registrados</p>
           ) : (
             <Table
               columns={[
